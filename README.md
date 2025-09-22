@@ -24,4 +24,8 @@
 
 ## 📦 Installation
 
-\`\`\`r \# install from GitHub (devtools or remotes) install.packages(c("devtools", "remotes"), repos = "<https://cloud.r-project.org>") remotes::install_github("orijitghosh/FlyDreamR", upgrade = "never")
+``` r
+# install from GitHub (devtools or remotes)
+install.packages(c("devtools", "remotes"), repos = "https://cloud.r-project.org")
+remotes::install_github("orijitghosh/FlyDreamR", upgrade = "never")
+```
