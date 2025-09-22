@@ -1,0 +1,12 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "FlyDreamR: Runs the Ghosh-Harbison hidden Markov model on activity count data to infer
+  sleep/wake states",
+  author   = "Arijit Ghosh and Susan T. Harbison",
+  journal  = "NA",
+  year     = "2025",
+  volume   = "NA",
+  number   = "NA",
+  pages    = "NA",
+  doi      = "NA",
+)
