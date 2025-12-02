@@ -13,7 +13,7 @@ contain columns like 'id', 'moving', 'asleep', 'activity', 'phase', 'day',
 'genotype', and 'replicate'.}
 }
 \value{
-A list containing multiple data.tables with summary metrics:
+A list containing multiple data.tables with summary metrics (in minutes):
 \itemize{
 \item \code{brief_awakenings_data}: The original data with a column for brief awakenings.
 \item \code{sleep_summary_phase}: Time spent sleeping per phase and day.

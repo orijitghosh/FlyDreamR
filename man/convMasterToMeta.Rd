@@ -19,7 +19,7 @@ Default: \code{"2024-04-11 06:00:00"}. Format: "YYYY-MM-DD HH:MM:SS".}
 
 \item{endDT}{Character string. The expected end date and time.
 Default: \code{"2024-04-16 06:00:00"}. Format: "YYYY-MM-DD HH:MM:SS".
-Note: Compared against a value derived only from the last date in the monitor file.}
+Note: Compared against a value derived from the monitor file.}
 
 \item{output_dir}{Character string. Path to the directory where the output metadata
 CSV file should be saved. Defaults to the current working directory (\code{.}).}

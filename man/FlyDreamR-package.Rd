@@ -4,8 +4,7 @@
 \name{FlyDreamR-package}
 \alias{FlyDreamR-package}
 \alias{FlyDreamR}
-\title{FlyDreamR: Runs the Ghosh-Harbison hidden Markov model on activity count data
-to infer sleep/wake states}
+\title{FlyDreamR: Runs the Ghosh-Harbison Hidden Markov Model on Activity Counts to Infer Sleep/Wake States}
 \description{
 The FlyDreamR package implements the Ghosh-Harbison hidden Markov model.
 It is designed to take activity count data as input and subsequently

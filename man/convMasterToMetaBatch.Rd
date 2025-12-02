@@ -57,7 +57,7 @@ my_master_files <- c("experiment_data/master53.txt", "experiment_data/master54.t
 all_metadata <- convMasterToMetaBatch(
   metafiles = my_master_files,
   startDT = "2024-04-11 06:00:00",
-  endDT   = "2024-04-16 06:00:00",
+  endDT = "2024-04-16 06:00:00",
   output_dir = "metadata_output"
 )
 
