@@ -50,20 +50,28 @@ HMMbehavrFast <- function(behavtbl,
 
   res_list <- foreach::foreach(
     individual_id = ids,
-    .combine = "list",
+    .combine = "c",
     .multicombine = TRUE,
     .packages = c("FlyDreamR", "depmixS4", "data.table", "dplyr")
     # .export   = c("process_individual") # not really needed, let future auto export
     # .errorhandling = "pass"   # uncomment to collect errors instead of stopping
   ) %dopar% {
-    process_individual(individual_id, behavtbl, it, ldcyc)
+    out <- process_individual(individual_id, behavtbl, it, ldcyc)
+    list(out)
   }
 
   tictoc::toc()
 
-  # ---- combine results ----
-  time_spent_in_states <- do.call(rbind, lapply(res_list, `[[`, 1))
-  hmm_sleep_profiles <- do.call(rbind, lapply(res_list, `[[`, 2))
+  # Drop NULLs if any worker failed and returned NULL
+  res_list <- Filter(Negate(is.null), res_list)
+
+  # Safely extract the two dfs by NAME and coerce to plain data.frame
+  get_ts <- function(x) as.data.frame(x[["TimeSpentInEachState"]])
+  get_vb <- function(x) as.data.frame(x[["VITERBIDecodedProfile"]])
+
+  # Use data.table::rbindlist (fast, tolerant) or dplyr::bind_rows
+  time_spent_in_states <- data.table::rbindlist(lapply(res_list, get_ts), use.names = TRUE, fill = TRUE)
+  hmm_sleep_profiles <- data.table::rbindlist(lapply(res_list, get_vb), use.names = TRUE, fill = TRUE)
 
   return(list(
     TimeSpentInEachState = time_spent_in_states,

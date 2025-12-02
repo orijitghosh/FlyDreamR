@@ -8,7 +8,7 @@
 #'   contain columns like 'id', 'moving', 'asleep', 'activity', 'phase', 'day',
 #'   'genotype', and 'replicate'.
 #'
-#' @return A list containing multiple data.tables with summary metrics:
+#' @return A list containing multiple data.tables with summary metrics (in minutes):
 #'   - `brief_awakenings_data`: The original data with a column for brief awakenings.
 #'   - `sleep_summary_phase`: Time spent sleeping per phase and day.
 #'   - `sleep_summary_whole_day`: Time spent sleeping per day.
@@ -84,13 +84,13 @@ calcTradSleep <- function(dt_test) {
 
   # Summarize bouts for the whole day
   bout_summary_day <- bout_dt[, .(
-    latency = t[1] - ((day - 1) * 86400),
-    first_bout_length = duration[1],
-    latency_to_longest_bout = t[which.max(duration)] - ((day - 1) * 86400),
-    length_longest_bout = max(duration),
+    latency = (t[1] - ((day - 1) * 86400))/60,
+    first_bout_length = (duration[1])/60,
+    latency_to_longest_bout = (t[which.max(duration)] - ((day - 1) * 86400))/60,
+    length_longest_bout = (max(duration))/60,
     n_bouts = .N,
-    mean_bout_length = mean(duration),
-    total_bout_length = sum(duration)
+    mean_bout_length = (mean(duration))/60,
+    total_bout_length = (sum(duration))/60
   ), by = c("id", "day")]
 
   # Summarize bouts by phase (Light/Dark)
@@ -99,9 +99,9 @@ calcTradSleep <- function(dt_test) {
 
   bout_summary_phase <- bout_dt_new[, .(
     n_bouts = .N,
-    mean_bout_length = mean(duration),
-    total_bout_length = sum(duration),
-    latency = t[1] - ((day - 1) * 86400)
+    mean_bout_length = (mean(duration))/60,
+    total_bout_length = (sum(duration))/60,
+    latency = (t[1] - ((day - 1) * 86400))/60
   ), by = c("id", "phase", "day")]
 
 

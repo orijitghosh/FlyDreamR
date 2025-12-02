@@ -19,7 +19,7 @@
 #'   Default: `"2024-04-11 06:00:00"`. Format: "YYYY-MM-DD HH:MM:SS".
 #' @param endDT Character string. The expected end date and time.
 #'   Default: `"2024-04-16 06:00:00"`. Format: "YYYY-MM-DD HH:MM:SS".
-#'   Note: Compared against a value derived only from the last date in the monitor file.
+#'   Note: Compared against a value derived from the monitor file.
 #' @param output_dir Character string. Path to the directory where the output metadata
 #'   CSV file should be saved. Defaults to the current working directory (`.`).
 #'
@@ -38,9 +38,9 @@
 #' }
 #' @export
 convMasterToMeta <- function(metafile,
-                             startDT = "2024-04-11 06:00:00",
-                             endDT = "2024-04-16 06:00:00",
-                             output_dir = ".") {
+                                startDT = "2024-04-11 06:00:00",
+                                endDT = "2024-04-16 06:00:00",
+                                output_dir = ".") {
   # --- 1. Read and Prepare Master Data ---
   cli::cli_alert_info("Reading master file: {metafile}")
   if (!file.exists(metafile)) {
@@ -100,8 +100,8 @@ convMasterToMeta <- function(metafile,
       # Assign temporary names to relevant columns for clarity (V2=Date, V3=Time, V10=LightStatus)
       colnames(monitor_data_raw)[c(2, 3, 10)] <- c("Date_Str", "Time_Str", "Light_Sensor_Status")
 
-      # --- CORRECTED LIGHTS-ON DETECTION LOGIC ---
-      # Process the monitor data to find when the light turns on.
+      # --- Process Monitor Data for Change Detection ---
+      # Process the monitor data to find when the light turns on/off.
       monitor_data_processed <- monitor_data_raw %>%
         dplyr::mutate(
           DateTime = lubridate::dmy_hms(paste(Date_Str, Time_Str), tz = "UTC", quiet = TRUE)
@@ -110,15 +110,17 @@ convMasterToMeta <- function(metafile,
         dplyr::arrange(DateTime) %>%
         dplyr::mutate(
           Light_Sensor_Status_num = as.numeric(Light_Sensor_Status),
-          change = Light_Sensor_Status_num - dplyr::lag(Light_Sensor_Status_num, default = first(Light_Sensor_Status_num))
+          # **FIXED**: Added dplyr::first() to resolve namespace error
+          change = Light_Sensor_Status_num - dplyr::lag(Light_Sensor_Status_num, default = dplyr::first(Light_Sensor_Status_num))
         )
 
+      # --- LIGHTS-ON DETECTION LOGIC (Existing) ---
       # Determine the target date from the user-provided startDT parameter
-      target_date <- as.Date(startDT)
+      target_start_date <- as.Date(startDT)
 
       # Find the first "lights ON" event (change > 0) specifically ON THE TARGET DATE.
       lights_on_event <- monitor_data_processed %>%
-        dplyr::filter(as.Date(DateTime) == target_date, change > 0) %>%
+        dplyr::filter(as.Date(DateTime) == target_start_date, change > 0) %>% # 0 -> 1 transition
         dplyr::slice(1) # Take the very first event on that day
 
       # Derive the actual start date/time string for comparison
@@ -126,19 +128,53 @@ convMasterToMeta <- function(metafile,
         actual_start_dt <- lights_on_event$DateTime
         formatted_actual_start <- format(actual_start_dt, "%Y-%m-%d %H:%M:%S")
       } else {
-        warning("Could not find a 'lights-ON' event for the provided start date: ", target_date)
+        warning("Could not find a 'lights-ON' event (0->1 transition) for the provided start date: ", target_start_date)
         formatted_actual_start <- NA
       }
-      # --- END OF CORRECTED LOGIC ---
+      # --- END OF LIGHTS-ON LOGIC ---
 
-      # Derive actual end date string (logic from original script: Date (V2) from last row)
-      actualEnd_str <- utils::tail(monitor_data_raw$Date_Str, 1) # Get last value of V2/Date_Str
 
-      # Parse and format actual end date (logic from original script: dmy -> Ymd HMS)
-      parsed_actual_end_date <- lubridate::dmy(actualEnd_str, quiet = TRUE)
-      formatted_actual_end <- format(parsed_actual_end_date, "%Y-%m-%d %H:%M:%S") # Formats date with 00:00:00 time
+      # --- NEW LIGHTS-OFF DETECTION LOGIC ---
+      # Derive actual end time by finding the closest "lights OFF" event
+      # on the same calendar day as the provided endDT.
 
-      # Compare provided startDT with derived start time
+      # Parse the user-provided endDT
+      target_end_datetime <- lubridate::ymd_hms(endDT, tz = "UTC", quiet = TRUE)
+
+      if (is.na(target_end_datetime)) {
+        warning("Could not parse the provided endDT: ", endDT, ". Skipping end time validation.")
+        formatted_actual_end <- NA
+      } else {
+        # Determine the target date from the user-provided endDT parameter
+        target_end_date <- as.Date(target_end_datetime)
+
+        # Find the "lights OFF" event (change < 0) on that calendar day
+        # that is closest to the provided time.
+        lights_off_event <- monitor_data_processed %>%
+          dplyr::filter(
+            as.Date(DateTime) == target_end_date,
+            # Use lead() to find the row *before* the change == 1 event
+            dplyr::lead(change, default = 0) == 1
+          ) %>%
+          dplyr::mutate(
+            abs_diff_secs = abs(as.numeric(difftime(DateTime, target_end_datetime, units = "secs")))
+          ) %>%
+          dplyr::arrange(abs_diff_secs) %>%
+          dplyr::slice(1) # Take the one closest in time
+
+        # Derive the actual end date/time string for comparison
+        if (nrow(lights_off_event) > 0) {
+          actual_end_dt <- lights_off_event$DateTime
+          formatted_actual_end <- format(actual_end_dt, "%Y-%m-%d %H:%M:%S")
+        } else {
+          warning("Could not find a 'lights-OFF' event (row before change==1) for the provided end date: ", target_end_date)
+          formatted_actual_end <- NA
+        }
+      }
+      # --- END OF NEW LOGIC ---
+
+
+      # --- Compare provided startDT with derived start time ---
       if (!is.na(formatted_actual_start)) {
         if (startDT == formatted_actual_start) {
           cli::cli_alert_success(cli::style_bold(cli::col_green("Start date-time matches the actual start date-time")))
@@ -152,18 +188,18 @@ convMasterToMeta <- function(metafile,
         cli::cli_alert_warning("Skipping start date comparison as actual start time could not be derived.")
       }
 
-      # Compare provided endDT with derived end time
+      # --- Compare provided endDT with derived end time ---
       if (!is.na(formatted_actual_end)) {
         if (endDT == formatted_actual_end) {
-          cli::cli_alert_success(cli::style_bold(cli::col_green("End date matches the actual end date")))
+          cli::cli_alert_success(cli::style_bold(cli::col_green("End date-time matches the actual end date-time")))
         } else {
           cli::cli_alert_warning(cli::style_bold(cli::col_red(
-            "End date does not match the actual end date, please double-check the end date in the monitor file, which is ",
+            "End date-time does not match the actual end date-time, please double-check the end date and lights-OFF time in the monitor file, which is ",
             formatted_actual_end
           )))
         }
       } else {
-        cli::cli_alert_warning("Skipping end date comparison as actual end date could not be derived.")
+        cli::cli_alert_warning("Skipping end date comparison as actual end time could not be derived.")
       }
     } # End check for valid monitor data read
   } # End check for monitor file existence

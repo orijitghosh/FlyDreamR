@@ -287,8 +287,10 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
       time_spent_all_states <- time_spent_all_states %>%
         dplyr::group_by(Genotype, ID, day) %>%
         tidyr::complete(
-          phase = unique(time_spent_all_states$phase),
-          state_name = unique(time_spent_all_states$state_name),
+          # phase = unique(time_spent_all_states$phase),
+          # state_name = unique(time_spent_all_states$state_name),
+          phase = c("light", "dark"),
+          state_name = c("State0", "State1", "State2", "State3"),
           fill = list(time_spent = 0)
         )
 
