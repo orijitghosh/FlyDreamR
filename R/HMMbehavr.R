@@ -32,7 +32,7 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
       profile_all_states <- data.frame()
       transitions_all_states <- data.frame()
       # This data frame will now correctly store all failed cases
-      failed_cases <- data.frame(ID = character(), Day = numeric(), ErrorMessage = character(), stringsAsFactors = FALSE)
+      failed_cases <<- data.frame(ID = character(), Day = numeric(), ErrorMessage = character(), stringsAsFactors = FALSE)
 
       dt_hmm <- behavtbl
       total_iterations <- length(unique(dt_hmm$id)) * length(unique(dt_hmm$day)) * it
@@ -57,9 +57,16 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
               # Prepare data for HMM: select time and normalized activity
               hmm_data <- as.data.frame(dt_processed[, c("t", "normact")])
 
-              # Replace zero values with a small value unlikely to occur naturally, to avoid issues with Gaussian distribution
-              # This is due to likelihood errors caused by zero SD in one state in depmixS4
-              hmm_data$normact <- ifelse(hmm_data$normact == 0, 1e-03, hmm_data$normact)
+              # Calculate adaptive replacement value for zeros
+              # Use the smaller of: 1e-03 or 1% of the minimum positive value
+              min_positive <- min(hmm_data$normact[hmm_data$normact > 0], na.rm = TRUE)
+              replacement_value <- min(1e-03, min_positive * 0.01)
+
+              # Replace zeros with the adaptive value to avoid Gaussian likelihood errors in depmixS4
+              # Since normact represents percentage of daily activity (0-100 scale),
+              # this ensures the replacement is well below any realistic non-zero activity level.
+              hmm_data$normact <- ifelse(hmm_data$normact == 0, replacement_value, hmm_data$normact)
+
               activity_data <- hmm_data$normact
 
               # Initialize data frames for results within the current individual and day
@@ -235,7 +242,7 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
                   )
                   cli::cli_alert_warning(msg)
 
-                  failed_cases <- rbind(
+                  failed_cases <<- rbind(
                     failed_cases,
                     data.frame(
                       ID = individual_id,
@@ -259,7 +266,7 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
                 time_spent_all_states <- rbind(time_spent_all_states, time_spent_summary)
               } else {
                 # If profile_iterations is empty, it means NO iteration succeeded. Log it as a failed case.
-                failed_cases <- rbind(failed_cases, data.frame(
+                failed_cases <<- rbind(failed_cases, data.frame(
                   ID = individual_id,
                   Day = day_number,
                   ErrorMessage = paste("No valid solution found after", it, "iterations."),
@@ -272,7 +279,7 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
               cli::cli_alert_danger(
                 cli::style_bold(cli::col_red("Error processing ID:", individual_id, "Day:", day_number, " - ", e$message))
               )
-              failed_cases <- rbind(failed_cases, data.frame(
+              failed_cases <<- rbind(failed_cases, data.frame(
                 ID = individual_id,
                 Day = day_number,
                 ErrorMessage = e$message,
