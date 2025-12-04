@@ -57,7 +57,7 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
               # Prepare data for HMM: select time and normalized activity
               hmm_data <- as.data.frame(dt_processed[, c("t", "normact")])
 
-              # Replace zero values with a small value to avoid issues with Gaussian distribution
+              # Replace zero values with a small value unlikely to occur naturally, to avoid issues with Gaussian distribution
               # This is due to likelihood errors caused by zero SD in one state in depmixS4
               hmm_data$normact <- ifelse(hmm_data$normact == 0, 1e-03, hmm_data$normact)
               activity_data <- hmm_data$normact
