@@ -272,11 +272,11 @@ The GUI allows you to: - Upload and convert master files interactively - Configu
 
 ### Traditional Sleep Analysis (`calcTradSleep()`)
 
-Returns a list with 7 data frames: 1. **sleep_summary_whole_day** - 24-hour sleep summaries 2. **sleep_summary_phase** - Day/night phase summaries 3. **bout_summary_whole_day** - Bout metrics for 24 hours 4. **bout_summary_phase** - Bout metrics by phase 5. **activity_index_whole_day** - Waking activity per minute (24h) 6. **activity_index_phase** - Waking activity by phase 7. **brief_awakenings_data** - Brief awakening statistics.
+Returns a list with 7 data frames: 1. **sleep_summary_whole_day**: 24-hour sleep summaries. 2. **sleep_summary_phase**: Day/night phase summaries. 3. **bout_summary_whole_day**: Bout metrics for 24 hours. 4. **bout_summary_phase**: Bout metrics by phase. 5. **activity_index_whole_day**: Waking activity per minute (24h). 6. **activity_index_phase**: Waking activity by phase. 7. **brief_awakenings_data**: Brief awakening statistics. All durations are in minutes.
 
 ### HMM Analysis (`HMMbehavr()` / `HMMbehavrFast()`)
 
-Returns a list with 2 data frames: 1. **TimeSpentInEachState** - Summary of time in each HMM state 2. **VITERBIDecodedProfile** - Raw Viterbi-decoded state sequences.
+Returns a list with 2 data frames: 1. **TimeSpentInEachState**: Summary of time in each HMM state 2. **VITERBIDecodedProfile**: Raw Viterbi-decoded state sequences.
 
 ------------------------------------------------------------------------
 
@@ -287,6 +287,7 @@ Returns a list with 2 data frames: 1. **TimeSpentInEachState** - Summary of time
 3.  **Visualization**: Combine plots using `patchwork` for publication figures.
 4.  **Data quality**: Check for dead flies or tracking issues before analysis.
 5.  **Reproducibility**: Always specify `startDT` and `endDT` explicitly in metadata conversion, and `set.seed()`.
+6.  **Help pages**: Check the help menu for each function for details regarding input and output data structures, and all function parameters.
 
 ------------------------------------------------------------------------
 
