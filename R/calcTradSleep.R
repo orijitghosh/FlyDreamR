@@ -1,39 +1,85 @@
-#' @title Calculate Comprehensive Sleep Metrics
-#' @description Processes activity data to calculate various sleep and activity
-#'   summary statistics, including sleep duration, activity index, brief awakenings,
-#'   and detailed sleep bout analysis.
+#' Calculate Comprehensive Sleep Metrics from Activity Data
 #'
-#' @param dt_test A data.table containing the detailed activity and sleep data,
-#'   typically the output of a function like `HMMDataPrep`. It must
-#'   contain columns like 'id', 'moving', 'asleep', 'activity', 'phase', 'day',
-#'   'genotype', and 'replicate'.
+#' @description
+#' Processes activity data to calculate traditional sleep metrics including sleep
+#' duration, activity index during wakefulness, brief awakenings, and detailed
+#' sleep bout characteristics. This function implements standard sleep analysis
+#' metrics commonly used in Drosophila sleep research.
 #'
-#' @return A list containing multiple data.tables with summary metrics (in minutes):
-#'   - `brief_awakenings_data`: The original data with a column for brief awakenings.
-#'   - `sleep_summary_phase`: Time spent sleeping per phase and day.
-#'   - `sleep_summary_whole_day`: Time spent sleeping per day.
-#'   - `activity_index_phase`: Activity index per phase and day.
-#'   - `activity_index_whole_day`: Activity index per day.
-#'   - `bout_summary_day`: Detailed sleep bout metrics per day.
-#'   - `bout_summary_phase`: Detailed sleep bout metrics per phase and day.
+#' A "brief awakening" is defined as a single time point of movement that is
+#' immediately preceded and followed by immobility, potentially indicating
+#' fragmented or shallow sleep.
+#'
+#' @param dt_test A \code{data.table} containing activity and sleep state data,
+#'   typically the output from \code{\link{HMMDataPrep}}. Must contain the
+#'   following columns:
+#'   \itemize{
+#'     \item \code{id}: Unique identifier for each individual
+#'     \item \code{moving}: Logical indicator of movement
+#'     \item \code{asleep}: Logical indicator of sleep state
+#'     \item \code{activity}: Numeric activity count
+#'     \item \code{phase}: Factor with levels "Light" and "Dark"
+#'     \item \code{day}: Integer day number
+#'     \item \code{genotype}: Character or factor indicating genotype
+#'     \item \code{replicate}: Character or factor indicating replicate ID
+#'   }
+#'
+#' @return A named list containing seven \code{data.table} objects with sleep
+#'   metrics (all time values in **minutes**):
+#'   \describe{
+#'     \item{\code{brief_awakenings_data}}{Original data with added
+#'       \code{brief_awakenings} column (logical)}
+#'     \item{\code{sleep_summary_phase}}{Total sleep time per phase (Light/Dark)
+#'       and day for each individual}
+#'     \item{\code{sleep_summary_whole_day}}{Total sleep time per day for each
+#'       individual}
+#'     \item{\code{activity_index_phase}}{Mean activity during wakefulness per
+#'       phase and day (total activity / time awake)}
+#'     \item{\code{activity_index_whole_day}}{Mean activity during wakefulness
+#'       per day}
+#'     \item{\code{bout_summary_day}}{Detailed sleep bout metrics per day including:
+#'       \itemize{
+#'         \item \code{latency}: Time to first sleep bout (minutes from day start)
+#'         \item \code{first_bout_length}: Duration of first sleep bout
+#'         \item \code{latency_to_longest_bout}: Time to longest bout
+#'         \item \code{length_longest_bout}: Duration of longest bout
+#'         \item \code{n_bouts}: Number of sleep bouts
+#'         \item \code{mean_bout_length}: Average bout duration
+#'         \item \code{total_bout_length}: Total sleep time from bouts
+#'       }}
+#'     \item{\code{bout_summary_phase}}{Sleep bout metrics per phase and day}
+#'   }
+#'
+#' @details
+#' The function calculates metrics separately for light and dark phases based on
+#' the \code{phase} column. Sleep bouts are identified using
+#' \code{\link[sleepr]{bout_analysis}} from the \code{sleepr} package.
+#'
+#' Activity index provides a measure of movement intensity during wake periods,
+#' which can indicate arousal threshold or sleep depth.
 #'
 #' @examples
 #' \dontrun{
-#' # Assume 'processed_data' is the output from the 'HMMDataPrep' function
+#' # Assume 'processed_data' is output from HMMDataPrep()
+#' sleep_metrics <- calcTradSleep(processed_data)
 #'
-#' # Run the function
-#' all_metrics <- calcTradSleep(processed_data)
+#' # Access individual metric tables
+#' daily_bouts <- sleep_metrics$bout_summary_day
+#' phase_sleep <- sleep_metrics$sleep_summary_phase
 #'
-#' # You can then access each summary table from the list
-#' daily_bout_summary <- all_metrics$bout_summary_day
-#' phase_sleep_summary <- all_metrics$sleep_summary_phase
+#' # View brief awakening data
+#' head(sleep_metrics$brief_awakenings_data)
 #'
-#' # View one of the summary tables
-#' print(daily_bout_summary)
+#' # Summary statistics
+#' summary(sleep_metrics$sleep_summary_whole_day$time_spent_sleeping)
 #' }
+#'
+#' @seealso
+#' \code{\link{HMMDataPrep}} for preparing input data
+#' \code{\link[sleepr]{bout_analysis}} for bout detection algorithm
+#'
 #' @export
 calcTradSleep <- function(dt_test) {
-  # Ensure necessary packages are available for the function's scope
 
   # --- 1. Identify Brief Awakenings ---
   # A brief awakening is a single time point of movement surrounded by immobility.

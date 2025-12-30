@@ -2,38 +2,129 @@
 % Please edit documentation in R/HMMplot.R
 \name{HMMplot}
 \alias{HMMplot}
-\title{Plot Inferred Sleep States from HMM}
+\title{Plot HMM Inferred Sleep States as Tile Heatmap}
 \usage{
 HMMplot(hmm_inference_list, color_palette = "default", user_colors = NULL)
 }
 \arguments{
-\item{hmm_inference_list}{A list, typically the output of the \code{HMMbehavr} function. It is expected to contain a data frame at the second position (\verb{[[2]]}) with columns like \code{timestamp}, \code{ID}, \code{state_name}, and \code{day}.}
+\item{hmm_inference_list}{A list, typically the output from \code{\link{HMMbehavr}}
+or \code{\link{HMMbehavrFast}}. The second element must be a data frame
+(\code{VITERBIDecodedProfile}) with columns: \code{timestamp}, \code{ID},
+\code{state_name}, and \code{day}.}
 
-\item{color_palette}{Name of the desired color palette. Available options are \code{"default"}, \code{"AG"}, and \code{"user"}. Defaults to \code{"default"}.}
+\item{color_palette}{Character string specifying which color palette to use.
+Options:
+\describe{
+\item{\code{"default"}}{Standard FlyDreamR colors (recommended)}
+\item{\code{"AG"}}{Alternative palette with warmer tones}
+\item{\code{"user"}}{Custom user-defined colors (requires \code{user_colors})}
+}
+Default: \code{"default"}.}
 
-\item{user_colors}{A named character vector specifying the colors for each state (e.g., \code{c("State0" = "red", "State1" = "blue")}).
-This parameter is only used when \code{color_palette = "user"}. If \code{"user"} is selected and this parameter is not provided or is incorrectly formatted, an error will be thrown.}
+\item{user_colors}{A named character vector specifying custom colors for each
+state. \strong{Only used when \code{color_palette = "user"}}. Must include all
+state names found in the data. Format:
+\code{c("State0" = "#RRGGBB", "State1" = "#RRGGBB", ...)}
+
+If \code{color_palette = "user"} but this parameter is \code{NULL} or
+incomplete, an error will be raised.}
 }
 \value{
-A \code{ggplot2} object representing the plot of inferred sleep states.
+A \code{ggplot2} object showing:
+\itemize{
+\item \strong{X-axis}: Time in hours (converted from minutes)
+\item \strong{Y-axis}: Individual IDs (discrete)
+\item \strong{Tiles}: Colored by state at each time point
+\item \strong{Facets}: Separate panels for each day
+\item \strong{Aspect ratio}: Dynamically calculated based on number of individuals
+}
+
+The returned object can be customized using standard \code{ggplot2} syntax.
 }
 \description{
-This function visualizes the sleep state flags inferred by a Hidden Markov Model (HMM) applied to behavioral data.
+Creates a tile-based heatmap visualization of Hidden Markov Model inferred
+behavioral states. Each individual is represented as a horizontal row, with
+time on the x-axis and states shown as colored tiles. Days are displayed as
+separate facets.
+
+This visualization provides a compact overview of state patterns across many
+individuals, making it easy to identify population-level trends and individual
+variability in sleep/wake architecture.
+}
+\details{
+\subsection{Color Palettes}{
+
+All palettes follow the same principle: warm colors = wake, cool colors = sleep
+
+\strong{"default" palette:}
+\itemize{
+\item State0: #f75c46 (coral, active wake)
+\item State1: #ffa037 (orange, quiet wake)
+\item State2: #33c5e8 (cyan, light sleep)
+\item State3: #004a73 (navy, deep sleep)
+}
+
+\strong{"AG" palette:}
+\itemize{
+\item State0: #fb8500
+\item State1: #ffb703
+\item State2: #8ecae6
+\item State3: #219ebc
+}
+}
+
+\subsection{When to Use This Plot}{
+
+Use \code{HMMplot} when you want to:
+\itemize{
+\item Compare many individuals simultaneously
+\item Identify population-level patterns (e.g., siesta in midday)
+\item Screen for outlier individuals
+\item Create compact publication figures
+}
+
+For detailed examination of individual state transitions, consider
+\code{\link{HMMFacetedPlot}} instead.
+}
 }
 \examples{
-# Assuming 'res1' is the output of HMMbehavr
+\dontrun{
+# Basic usage with default palette
+hmm_results <- HMMbehavr(processed_data)
+p <- HMMplot(hmm_results)
+print(p)
+
+# Try alternative palette
+p_ag <- HMMplot(hmm_results, color_palette = "AG")
+
+# Use custom colors (e.g., for colorblind-friendly palette)
+custom_colors <- c(
+  "State0" = "#D55E00",  # vermillion
+  "State1" = "#E69F00",  # orange
+  "State2" = "#56B4E9",  # sky blue
+  "State3" = "#0072B2"   # blue
+)
+p_custom <- HMMplot(
+  hmm_results,
+  color_palette = "user",
+  user_colors = custom_colors
+)
+
+# Save high-resolution figure
+ggsave("hmm_states_overview.pdf", p,
+       width = 10, height = 6, dpi = 300)
+
+# Further customize
 library(ggplot2)
+p +
+  labs(title = "Sleep/Wake States Across Population",
+       subtitle = "Wildtype controls, LD 12:12") +
+  theme(legend.position = "right")
+}
 
-# Using default palette
-plot_default <- HMMplot(hmm_inference_list = res1)
-print(plot_default)
-
-# Using AG palette
-plot_AG <- HMMplot(hmm_inference_list = res1, color_palette = "AG")
-print(plot_AG)
-
-# Using a custom user-defined palette
-user_palette <- c("State0" = "lightgreen", "State1" = "darkgreen", "State2" = "lightblue", "State3" = "darkblue")
-plot_user <- HMMplot(hmm_inference_list = res1, color_palette = "user", user_colors = user_palette)
-print(plot_user)
+}
+\seealso{
+\code{\link{HMMFacetedPlot}} for detailed multi-panel visualization
+\code{\link{HMMSinglePlot}} for saving individual plots
+\code{\link{HMMbehavr}} for generating input data
 }

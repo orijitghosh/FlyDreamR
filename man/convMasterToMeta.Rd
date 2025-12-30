@@ -12,50 +12,232 @@ convMasterToMeta(
 )
 }
 \arguments{
-\item{metafile}{Character string. Full path to the input master file. No default.}
+\item{metafile}{Character string. Full path to the input master file.
+No default value - must be specified.
 
-\item{startDT}{Character string. The expected start date and time.
-Default: \code{"2024-04-11 06:00:00"}. Format: "YYYY-MM-DD HH:MM:SS".}
+\strong{Example}: \code{"path/to/master53.txt"}}
 
-\item{endDT}{Character string. The expected end date and time.
-Default: \code{"2024-04-16 06:00:00"}. Format: "YYYY-MM-DD HH:MM:SS".
-Note: Compared against a value derived from the monitor file.}
+\item{startDT}{Character string. Expected experimental start date and time
+in format \code{"YYYY-MM-DD HH:MM:SS"}.
 
-\item{output_dir}{Character string. Path to the directory where the output metadata
-CSV file should be saved. Defaults to the current working directory (\code{.}).}
+Default: \code{"2024-04-11 06:00:00"}.
+
+This should correspond to a lights-ON event in the monitor file. The function
+will validate this by checking the monitor file's light sensor data and warn
+if there's a mismatch.}
+
+\item{endDT}{Character string. Expected experimental end date and time
+in format \code{"YYYY-MM-DD HH:MM:SS"}.
+
+Default: \code{"2024-04-16 06:00:00"}.
+
+This should correspond to a lights-OFF event in the monitor file. The function
+will find the lights-OFF event on the specified date closest to this time.}
+
+\item{output_dir}{Character string. Directory path for saving the output
+metadata CSV file.
+
+Default: \code{"."} (current working directory).
+
+The directory will be created automatically if it doesn't exist.}
 }
 \value{
-A data frame containing the formatted metadata (equivalent to the written CSV content).
-A CSV file is also written to \code{output_dir}.
+Invisibly returns a \code{data.frame} containing the formatted metadata
+(identical to the CSV file content). The function also writes a CSV file to
+disk.
+
+\strong{Output filename format}: \code{Metadata_Block[X]Rep[Y]Monitor[Z].csv}
+
+For example: \code{Metadata_Block1Rep1Monitor53.csv}
+
+\strong{The output CSV contains 6 columns}:
+\describe{
+\item{\code{file}}{Monitor filename (e.g., "Monitor53.txt"). This should
+exist in the same directory as the master file.}
+\item{\code{start_datetime}}{Experiment start date and time (from \code{startDT})}
+\item{\code{stop_datetime}}{Experiment end date and time (from \code{endDT})}
+\item{\code{region_id}}{Channel number within the monitor (1-32)}
+\item{\code{genotype}}{Combined identifier in format "Line_Sex"
+(e.g., "w1118_F", "mutant_M")}
+\item{\code{replicate}}{Combined identifier in format "BlockXRepY"
+(e.g., "Block1Rep1", "Block2Rep3")}
+}
 }
 \description{
-Reads a master file, optionally validates start/end times against a
-monitor file, and generates a metadata file for FlyDreamR.
+Converts a DAM (Drosophila Activity Monitor) master file into the metadata
+format required by FlyDreamR. The function reads the master file, validates
+the start and end times against the corresponding monitor file's light sensor
+data, and generates a properly formatted metadata CSV file.
+
+The validation process checks that:
+\itemize{
+\item The provided start time matches the first "lights-ON" event on the
+specified start date
+\item The provided end time matches the "lights-OFF" event closest to the
+specified end time on that date
+}
+}
+\details{
+\subsection{Validation Process}{
+
+The function performs several validation steps:
+\enumerate{
+\item \strong{Read master file}: Loads and validates structure (8 columns, tab-delimited)
+\item \strong{Filter rows}: Keeps only rows with \code{SetupCode = 1}
+\item \strong{Locate monitor file}: Assumes monitor file (e.g., "Monitor53.txt")
+is in the same directory as the master file
+\item \strong{Parse light sensor data}: Reads the monitor file's 10th column
+(light sensor status)
+\item \strong{Find lights-ON event}: Identifies the first 0→1 transition on the
+start date
+\item \strong{Find lights-OFF event}: Identifies the lights-OFF event (row before
+change==1) on the end date closest to the specified time
+\item \strong{Compare times}: Issues color-coded warnings if provided times don't
+match actual transitions
+\item \strong{Generate metadata}: Creates properly formatted output regardless of
+validation results
+\item \strong{Save CSV}: Writes to disk with automatic filename generation
+}
+}
+
+\subsection{Light Sensor Validation}{
+
+The validation uses the monitor file's light sensor column (column 10):
+\itemize{
+\item \strong{Value 0}: Lights OFF (dark)
+\item \strong{Value 1}: Lights ON (light)
+\item \strong{Transition 0→1}: Lights turning ON (dawn)
+\item \strong{Row before transition 1→0}: Lights turning OFF (dusk)
+}
+
+This validation helps catch common errors like:
+\itemize{
+\item Wrong start date (off by one day)
+\item Incorrect time (using 18:00 instead of 06:00)
+\item Daylight saving time issues
+\item Monitor clock drift
+}
+}
+
+\subsection{Error Handling}{
+
+The function will:
+\itemize{
+\item \strong{Stop with error} if:
+- Master file doesn't exist or can't be read
+- Master file doesn't have exactly 8 columns
+- No rows with SetupCode = 1 found
+\item \strong{Issue warning} if:
+- Monitor file not found (validation skipped, metadata still generated)
+- Start/end times don't match monitor file transitions
+- Multiple unique monitor files implied by master data
+\item \strong{Continue processing} even if validation fails
+}
+}
+
+\subsection{File Location Assumptions}{
+
+The function assumes:
+\itemize{
+\item Monitor files (e.g., "Monitor53.txt") are in the \strong{same directory}
+as the master file
+\item Monitor filename matches the pattern "Monitor\link{N}.txt" where N is the
+monitor number from the master file
+}
+
+If your files are organized differently, you may need to adjust file paths.
+}
+}
+\note{
+\strong{Common Issues:}
+\enumerate{
+\item \strong{"Start date-time does not match" warning}:
+\itemize{
+\item Check that your startDT corresponds to lights turning ON
+\item Verify the date is correct (not off by one day)
+\item Confirm time zone matches your incubator settings
+}
+\item \strong{"Monitor file not found" warning}:
+\itemize{
+\item Ensure Monitor\link{N}.txt is in the same directory as master file
+\item Check the monitor number in your master file is correct
+}
+\item \strong{"No rows with SetupCode = 1"}:
+\itemize{
+\item Verify your master file has some rows with SetupCode = 1
+\item Check for tab-delimited format (not spaces)
+}
+}
 }
 \section{Master File Format}{
 
-The master file should be a tab-delimited text file \strong{without a header row}.
-It must contain the following columns in order:
+The master file must be a \strong{tab-delimited text file without a header row}.
+It must contain exactly 8 columns in the following order:
 \enumerate{
-\item Monitor number
-\item Channel number
-\item Genotype/Line
-\item Sex
-\item Treatment
-\item Replicate number
-\item Block number
-\item SetupCode (Use \code{1} for channels to include, others ignored)
+\item \strong{Monitor}: Monitor number (integer)
+\item \strong{Channel}: Channel number within the monitor (integer, 1-32 typically)
+\item \strong{Line}: Genotype or line identifier (character)
+\item \strong{Sex}: Sex of the individual (character, e.g., "M" or "F")
+\item \strong{Treatment}: Experimental treatment (character)
+\item \strong{Rep}: Replicate number (integer)
+\item \strong{Block}: Block number for experimental design (integer)
+\item \strong{SetupCode}: Inclusion flag (integer; use \code{1} to include
+the channel in output, any other value to exclude)
 }
+
+Only rows with \code{SetupCode = 1} will be included in the output metadata.
+}
+
+\section{Example Master File}{
+
+\preformatted{
+53  1   w1118   F   control   1   1   1
+53  2   w1118   F   control   1   1   1
+53  3   mutant  M   drug      1   1   1
+53  4   mutant  M   drug      1   1   0
+}
+The 4th row would be excluded (SetupCode = 0).
 }
 
 \examples{
 \dontrun{
-# Need actual 'master53.txt' and 'Monitor53.txt' files to run
-convMasterToMeta(
-  metafile = "master53.txt",
-  startDT = "2011-10-12 06:15:00",
-  endDT = "2011-10-16 06:00:00",
-  output_dir = "."
+# Basic usage with default start/end times
+metadata <- convMasterToMeta(
+  metafile = "path/to/master53.txt"
 )
+# Output: Metadata_Block1Rep1Monitor53.csv (in current directory)
+
+# Specify custom start/end times and output directory
+metadata <- convMasterToMeta(
+  metafile = "experiment_data/master53.txt",
+  startDT = "2024-01-15 09:00:00",  # Lights ON at 9 AM
+  endDT = "2024-01-20 09:00:00",    # Lights OFF at 9 AM (5 days later)
+  output_dir = "processed_metadata"
+)
+# Output: processed_metadata/Metadata_Block1Rep1Monitor53.csv
+
+# Process master file with validation
+metadata <- convMasterToMeta(
+  metafile = "raw_data/master54.txt",
+  startDT = "2024-02-01 06:00:00",
+  endDT = "2024-02-06 18:00:00"     # Ends at dusk instead of dawn
+)
+# Function will validate times against Monitor54.txt
+
+# Inspect the returned metadata
+print(metadata)
+str(metadata)
+head(metadata)
+
+# Check what files were referenced
+unique(metadata$file)
+
+# See genotype combinations
+table(metadata$genotype)
 }
+
+}
+\seealso{
+\code{\link{convMasterToMetaBatch}} for processing multiple master files at once
+\code{\link{HMMDataPrep}} for using the generated metadata to load DAM data
 }

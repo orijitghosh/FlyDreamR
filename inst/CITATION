@@ -1,12 +1,22 @@
+citHeader("To cite FlyDreamR in publications use:")
+
 bibentry(
-  bibtype  = "Article",
-  title    = "FlyDreamR: Runs the Ghosh-Harbison hidden Markov model on activity count data to infer
-  sleep/wake states",
-  author   = "Arijit Ghosh and Susan T. Harbison",
-  journal  = "NA",
+  bibtype  = "Manual",
+  title    = "FlyDreamR: Hidden Markov Model-Based Sleep State Inference for Drosophila",
+  author   = c(person("Arijit", "Ghosh", email = "arijitghosh2009@gmail.com")),
   year     = "2025",
-  volume   = "NA",
-  number   = "NA",
-  pages    = "NA",
-  doi      = "NA",
+  note     = "R package version 1.0.0",
+  url      = "https://github.com/yourusername/FlyDreamR"
 )
+
+# Add actual publication after acceptance:
+# bibentry(
+#   bibtype  = "Article",
+#   title    = "Hidden Markov models reveal heterogeneous sleep states in Drosophila",
+#   author   = c(person("Arijit", "Ghosh"), person("Susan T.", "Harbison")),
+#   journal  = "Journal Name",
+#   year     = "2025",
+#   volume   = "XX",
+#   pages    = "XXX-XXX",
+#   doi      = "10.xxxx/xxxxx"
+# )

@@ -1,13 +1,116 @@
-#' @title HMMbehavr
-#' @description This function runs a Hidden Markov Model (HMM) on behavioral data.
-#' @param behavtbl A data frame containing the behavioral data, conforming to a \code{behavr} table.
-#' @param it Integer (>= 100) specifying the number of iterations for the HMM fitting process. Defaults to 100.
-#' @param ldcyc A single numeric value specifying the duration of the light phase in hours. If NULL (default), a 12-hour light/12-hour dark cycle is assumed.
-#' @return A list containing data frames:
-#'   \item{TimeSpentInEachState}{Time spent in each inferred state.}
-#'   \item{VITERBIDecodedProfile}{The most likely sequence of hidden states (Viterbi path).}
+#' Infer Sleep States Using Hidden Markov Model
+#'
+#' @description
+#' Applies a Hidden Markov Model (HMM) to behavioral activity data to infer
+#' discrete sleep/wake states. The model identifies four behavioral states
+#' (State0-State3) ordered by activity level, where State0 represents the
+#' highest activity (active wake) and State3 represents the lowest activity
+#' (deep sleep).
+#'
+#' The function fits an HMM with 4 states using Gaussian emission distributions
+#' for normalized activity levels. Multiple iterations are performed for each
+#' individual and day to ensure robust state inference, with the most frequently
+#' inferred state at each time point selected as the final classification.
+#'
+#' @param behavtbl A \code{behavr} table (data.frame/data.table) containing
+#'   behavioral data. Must include columns: \code{id}, \code{day}, \code{normact}
+#'   (normalized activity), \code{genotype}, and \code{t} (time in seconds).
+#'   Typically the output from \code{\link{HMMDataPrep}}.
+#' @param it Integer specifying the number of HMM fitting iterations per
+#'   individual per day. Must be >= 100 (enforced). Higher values increase
+#'   robustness but require more computation time. Default: 100.
+#'
+#'   Each iteration fits an HMM with random initialization. The final state
+#'   assignment at each time point is determined by majority vote across
+#'   all iterations, providing a measure of classification confidence.
+#' @param ldcyc Numeric value specifying the light phase duration in hours
+#'   (e.g., 12 for LD 12:12). If \code{NULL} (default), assumes a 12-hour
+#'   light phase. Used to assign "light" and "dark" phase labels to time points.
+#'
+#' @return A list containing two data frames:
+#'   \describe{
+#'     \item{\code{TimeSpentInEachState}}{Summary of time (in minutes) spent in
+#'       each state, grouped by:
+#'       \itemize{
+#'         \item \code{ID}: Individual identifier
+#'         \item \code{Genotype}: Genotype
+#'         \item \code{day}: Day number
+#'         \item \code{phase}: Light or dark phase
+#'         \item \code{state_name}: State0, State1, State2, or State3
+#'         \item \code{time_spent}: Minutes in that state
+#'       }
+#'       All state-phase combinations are present (filled with 0 if not observed).
+#'     }
+#'     \item{\code{VITERBIDecodedProfile}}{Time-series of inferred states with columns:
+#'       \itemize{
+#'         \item \code{timestamp}: Time point index (1 to total time points)
+#'         \item \code{state}: Raw HMM state label
+#'         \item \code{state_name}: Activity-ordered state name (State0-State3)
+#'         \item \code{phase}: Light or dark
+#'         \item \code{ID}, \code{Genotype}, \code{day}: Grouping variables
+#'       }
+#'     }
+#'   }
+#'
+#' @details
+#' ## State Interpretation
+#' States are ordered by median activity level:
+#' \itemize{
+#'   \item \strong{State0}: Highest activity (active wake)
+#'   \item \strong{State1}: Moderate activity (quiet wake)
+#'   \item \strong{State2}: Low activity (light sleep)
+#'   \item \strong{State3}: Lowest activity (deep sleep)
+#' }
+#'
+#' ## Failed Cases
+#' The function tracks cases where HMM fitting fails or produces invalid results:
+#' \itemize{
+#'   \item No valid solution after maximum iterations
+#'   \item Single-state dominance (>99% of time in one state) - indicates
+#'     insufficient behavioral variability
+#' }
+#' Failed cases are printed to console and excluded from results.
+#'
+#' ## Performance Notes
+#' - Progress bar shows overall fitting progress
+#' - For large datasets, consider using \code{\link{HMMbehavrFast}} for
+#'   parallel processing
+#' - Typical runtime: ~1-2 seconds per individual-day with it=100
+#'
 #' @examples
-#' res1 <- HMMbehavr(behavtbl = dt_test, it = 100, ldcyc = 10) # 10 hours light, 100 iterations
+#' \dontrun{
+#' # Basic usage with default parameters
+#' hmm_results <- HMMbehavr(behavtbl = processed_data)
+#'
+#' # Custom light cycle and more iterations
+#' hmm_results <- HMMbehavr(
+#'   behavtbl = processed_data,
+#'   it = 200,           # More robust inference
+#'   ldcyc = 16          # LD 16:8 cycle
+#' )
+#'
+#' # Access results
+#' time_in_states <- hmm_results$TimeSpentInEachState
+#' state_profile <- hmm_results$VITERBIDecodedProfile
+#'
+#' # Summarize sleep (State2 + State3)
+#' library(dplyr)
+#' sleep_summary <- time_in_states %>%
+#'   filter(state_name %in% c("State2", "State3")) %>%
+#'   group_by(ID, day, phase) %>%
+#'   summarise(total_sleep_min = sum(time_spent))
+#' }
+#'
+#' @seealso
+#' \code{\link{HMMbehavrFast}} for parallel implementation
+#' \code{\link{HMMDataPrep}} for preparing input data
+#' \code{\link{HMMplot}} for visualizing results
+#' \code{\link{HMMFacetedPlot}} for multi-individual visualization
+#'
+#' @references
+#' Ghosh, A., & Harbison, S. T. (2024). Hidden Markov models reveal
+#' heterogeneity in sleep states. (Add actual reference when published)
+#'
 #' @export
 HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
   # validate + clamp iterations

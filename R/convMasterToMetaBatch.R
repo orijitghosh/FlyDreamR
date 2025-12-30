@@ -1,46 +1,130 @@
-#' @title Convert Multiple Master Files to FlyDreamR Metadata Format (Batch)
-#' @description Reads one or more master files, optionally validates start/end times against
-#'   their corresponding monitor files, and generates individual metadata CSVs.
+#' Batch Convert Multiple Master Files to FlyDreamR Metadata Format
+#'
+#' @description
+#' Processes multiple DAM master files in batch, converting each to the metadata
+#' format required by FlyDreamR. This is a convenient wrapper around
+#' \code{\link{convMasterToMeta}} that handles multiple files with the same
+#' start/end times.
+#'
+#' The function validates each master file against its corresponding monitor
+#' file, generates individual metadata CSV files, and returns a combined
+#' metadata table for all processed files.
 #'
 #' @section Master File Format:
-#' Each master file should be a tab-delimited text file **without a header row**.
-#' It must contain the following columns in order:
-#' 1.  Monitor number
-#' 2.  Channel number
-#' 3.  Genotype/Line
-#' 4.  Sex
-#' 5.  Treatment
-#' 6.  Replicate number
-#' 7.  Block number
-#' 8.  SetupCode (Use `1` for channels to include, others ignored)
+#' Each master file should follow the same format as described in
+#' \code{\link{convMasterToMeta}}:
+#' \itemize{
+#'   \item Tab-delimited text file
+#'   \item No header row
+#'   \item 8 columns: Monitor, Channel, Line, Sex, Treatment, Rep, Block, SetupCode
+#'   \item Only rows with SetupCode = 1 are processed
+#' }
 #'
-#' @param metafiles Character vector. Full paths to the input master files. No default.
-#' @param startDT Character string. The expected start date and time.
-#'   Default: `"2024-04-11 06:00:00"`. Format: "YYYY-MM-DD HH:MM:SS".
-#' @param endDT Character string. The expected end date and time.
-#'   Default: `"2024-04-16 06:00:00"`. Format: "YYYY-MM-DD HH:MM:SS".
-#'   Note: Compared against a value derived only from the last date in the monitor file.
-#' @param output_dir Character string. Path to the directory where the output metadata
-#'   CSV files should be saved. Defaults to the current working directory (`.`).
+#' @param metafiles Character vector containing full paths to all master files
+#'   to process. Can be generated using \code{Sys.glob()} or \code{list.files()}.
+#'   No default value.
+#' @param startDT Character string. Expected experimental start date-time
+#'   **applied to all files**. Format: \code{"YYYY-MM-DD HH:MM:SS"}.
+#'   Default: \code{"2024-04-11 06:00:00"}.
+#' @param endDT Character string. Expected experimental end date-time
+#'   **applied to all files**. Format: \code{"YYYY-MM-DD HH:MM:SS"}.
+#'   Default: \code{"2024-04-16 06:00:00"}.
+#' @param output_dir Character string. Directory where all metadata CSV files
+#'   will be saved. Defaults to current working directory (\code{"."}).
+#'   Created if it doesn't exist.
 #'
-#' @return A single data frame containing the combined formatted metadata (equivalent to
-#'   the written CSV content) from all successfully processed master files.
-#'   Individual CSV files are also written to `output_dir`.
+#' @return A single \code{data.frame} combining metadata from all successfully
+#'   processed master files. Contains the same columns as individual metadata
+#'   files (see \code{\link{convMasterToMeta}} for column details).
+#'
+#'   Individual CSV files are also written to \code{output_dir}, one per
+#'   master file processed.
+#'
+#'   If a file fails to process, it is skipped with a warning message, and
+#'   processing continues with remaining files.
+#'
+#' @details
+#' ## Batch Processing Workflow
+#' For each master file, the function:
+#' \enumerate{
+#'   \item Calls \code{\link{convMasterToMeta}} with provided parameters
+#'   \item Validates start/end times against the monitor file
+#'   \item Saves individual metadata CSV
+#'   \item Collects metadata for combining
+#'   \item Handles errors gracefully (skips failed files)
+#' }
+#'
+#' ## Error Handling
+#' \itemize{
+#'   \item Each file is wrapped in \code{tryCatch}
+#'   \item Failed files generate a warning but don't stop processing
+#'   \item Successfully processed files are combined in the final output
+#'   \item Summary statistics printed at completion
+#' }
+#'
+#' ## Use Cases
+#' Use batch processing when you have:
+#' \itemize{
+#'   \item Multiple monitor files from the same experiment (same timing)
+#'   \item Multiple replicates run simultaneously
+#'   \item Multiple blocks in a large-scale screen
+#' }
+#'
+#' **Important**: All files must share the same start/end times. If your
+#' master files have different timings, process them separately using
+#' \code{\link{convMasterToMeta}}.
+#'
+#' ## Performance
+#' Processing speed depends on:
+#' \itemize{
+#'   \item Number of files
+#'   \item Size of monitor files (for validation)
+#'   \item I/O speed
+#' }
+#' Typical: 1-2 seconds per file.
 #'
 #' @examples
 #' \dontrun{
-#' # Vector of master files (or use Sys.glob("path/master*.txt"))
-#' my_master_files <- c("experiment_data/master53.txt", "experiment_data/master54.txt")
+#' # Find all master files in a directory
+#' master_files <- Sys.glob("experiment_data/master*.txt")
 #'
+#' # Process all with same start/end times
 #' all_metadata <- convMasterToMetaBatch(
-#'   metafiles = my_master_files,
-#'   startDT = "2024-04-11 06:00:00",
-#'   endDT = "2024-04-16 06:00:00",
-#'   output_dir = "metadata_output"
+#'   metafiles = master_files,
+#'   startDT = "2024-01-15 09:00:00",
+#'   endDT = "2024-01-20 09:00:00",
+#'   output_dir = "processed_metadata"
 #' )
 #'
+#' # View combined results
 #' print(all_metadata)
+#' table(all_metadata$genotype)
+#'
+#' # Alternatively, specify files explicitly
+#' master_files <- c(
+#'   "data/master53.txt",
+#'   "data/master54.txt",
+#'   "data/master55.txt"
+#' )
+#' metadata <- convMasterToMetaBatch(master_files)
+#'
+#' # Use list.files() with pattern matching
+#' master_files <- list.files(
+#'   path = "raw_data",
+#'   pattern = "^master.*\\.txt$",
+#'   full.names = TRUE
+#' )
+#' metadata <- convMasterToMetaBatch(
+#'   metafiles = master_files,
+#'   output_dir = "metadata"
+#' )
 #' }
+#'
+#' @seealso
+#' \code{\link{convMasterToMeta}} for single file processing and format details
+#' \code{\link{HMMDataPrep}} for using the generated metadata
+#' \code{\link[base]{Sys.glob}} for finding files with wildcards
+#'
 #' @export
 convMasterToMetaBatch <- function(metafiles,
                                   startDT = "2024-04-11 06:00:00",

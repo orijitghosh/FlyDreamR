@@ -2,22 +2,123 @@
 % Please edit documentation in R/HmmSinglePlot.R
 \name{HMMSinglePlot}
 \alias{HMMSinglePlot}
-\title{HMMplot}
+\title{Save Individual HMM State Plots to Disk}
 \usage{
 HMMSinglePlot(HMMinferList, col_palette = "default")
 }
 \arguments{
-\item{HMMinferList}{A list. Output of \code{HMMbehavr}.}
+\item{HMMinferList}{A list, typically the output from \code{\link{HMMbehavr}}.
+The second element (\code{HMMinferList[[2]]}) must be a data frame with
+the \code{VITERBIDecodedProfile} containing: \code{ID}, \code{day},
+\code{timestamp}, \code{state_name}, and \code{Genotype}.}
 
-\item{col_palette}{Name of desired color palette. Currently 2 options available - \code{default}, and \code{AG}.}
+\item{col_palette}{Character string specifying the color palette. Options:
+\describe{
+\item{\code{"default"}}{Standard FlyDreamR colors}
+\item{\code{"AG"}}{Alternative palette}
+}
+Default: \code{"default"}.}
 }
 \value{
-A \code{ggplot2} object.
+\code{NULL}. This function is called for its side effect of saving
+plot files to disk. It does not return plot objects.
 }
 \description{
-This function is used to save the sleep states inferred through a Hidden Markov Model (HMM) on behavioral data.
-The function saves the plots in the current working directory.
+Generates and saves individual plots of HMM-inferred sleep states to PNG files.
+Creates one plot per individual per day, organized in a directory structure
+by genotype. Each plot shows the time-series of state assignments with a
+light/dark phase annotation.
+
+\strong{Note:} This function is designed for batch processing and automatically
+saves plots to disk. It does not return plots for interactive viewing.
+For interactive plotting, use \code{\link{HMMplot}} or \code{\link{HMMFacetedPlot}}.
+}
+\details{
+\subsection{File Organization}{
+
+Plots are saved with the following structure:
+\preformatted{
+./profiles_all/
+  └── [Genotype]/
+      ├── [ID]_day1_4states.png
+      ├── [ID]_day2_4states.png
+      └── ...
+}
+
+## File Naming
+Each file is named: \code{[ID]_day[N]_4states.png}
+\itemize{
+\item ID is sanitized (timestamps and pipe characters removed)
+\item Day number is appended
+\item Suffix "_4states" indicates 4-state HMM
+}
+}
+
+\subsection{Directory Creation}{
+
+The function automatically creates necessary directories:
+\itemize{
+\item Base directory: \code{./profiles_all/}
+\item Subdirectories for each unique genotype
+}
+}
+
+\subsection{Error Handling}{
+
+\itemize{
+\item If state separation fails for an individual-day, that plot is skipped
+silently (wrapped in \code{tryCatch})
+\item If directory creation fails, file save is skipped
+\item Progress is printed to console for each file
+}
+}
+
+\subsection{Performance}{
+
+For large datasets:
+\itemize{
+\item 32 individuals × 3 days = 96 PNG files
+\item Approximate time: 30-60 seconds
+\item Disk space: ~100-200 KB per plot
+}
+}
+}
+\note{
+This function is most useful for:
+\itemize{
+\item Creating archival records of individual results
+\item Manual inspection of individual flies
+\item Sharing results with collaborators
+\item Supplementary materials for publications
+}
+
+For interactive analysis or presentation figures, consider using
+\code{\link{HMMplot}} or \code{\link{HMMFacetedPlot}} instead, which
+return ggplot objects that can be customized and viewed interactively.
 }
 \examples{
-HMMSinglePlot(HMMinferList = res1)
+\dontrun{
+# Generate HMM results
+hmm_results <- HMMbehavr(processed_data)
+
+# Save all plots with default colors
+HMMSinglePlot(hmm_results)
+
+# Save with alternative palette
+HMMSinglePlot(hmm_results, col_palette = "AG")
+
+# Check output directory structure
+list.dirs("./profiles_all", recursive = TRUE)
+
+# List all generated files
+list.files("./profiles_all",
+           pattern = "\\\\.png$",
+           recursive = TRUE)
+}
+
+}
+\seealso{
+\code{\link{HMMplot}} for interactive tile plot
+\code{\link{HMMFacetedPlot}} for interactive faceted plot
+\code{\link{HMMbehavr}} for generating input data
 }

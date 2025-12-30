@@ -2,30 +2,121 @@
 % Please edit documentation in R/HMMFacetedPlot.R
 \name{HMMFacetedPlot}
 \alias{HMMFacetedPlot}
-\title{Create a Faceted Plot of HMM Inferred States}
+\title{Create Faceted Plot of HMM Inferred States}
 \usage{
 HMMFacetedPlot(HMMinferList, col_palette = "default")
 }
 \arguments{
-\item{HMMinferList}{A list. The output of \code{HMMbehavr}. The second element
-HMMinferList[\link{2}] is expected to be a data frame.}
+\item{HMMinferList}{A list, typically the output from \code{\link{HMMbehavr}}
+or \code{\link{HMMbehavrFast}}. The second element (\code{HMMinferList[[2]]})
+must be a data frame containing the \code{VITERBIDecodedProfile} with columns:
+\itemize{
+\item \code{ID}: Individual identifier
+\item \code{day}: Day number
+\item \code{timestamp}: Time point index (1 to 1440 for minute resolution)
+\item \code{state_name}: State label (State0, State1, State2, State3)
+\item \code{Genotype}: Genotype identifier
+}}
 
-\item{col_palette}{Name of desired color palette. Currently 2 options are
-partially supported - \code{default}, and \code{AG}.}
+\item{col_palette}{Character string specifying the color palette. Options:
+\describe{
+\item{\code{"default"}}{Standard FlyDreamR colors (red-orange for wake,
+blue for sleep)}
+\item{\code{"AG"}}{Alternative warm/cool palette}
+}
+Default: \code{"default"}.}
 }
 \value{
-A \code{ggplot2} object representing the faceted plot.
+A \code{ggplot2} object displaying a faceted plot with:
+\itemize{
+\item \strong{X-axis}: Time in hours (0-24)
+\item \strong{Y-axis}: State names (State0 through State3)
+\item \strong{Facets}: One panel per individual-day combination, arranged in
+a grid. Facet labels show ID and "Day: N"
+\item \strong{Colors}: States colored by activity level (warm = active, cool = sleep)
+\item \strong{Light/Dark annotation}: Black bar at bottom with white overlay
+indicating light phase
+}
+
+The plot can be further customized using standard \code{ggplot2} functions
+or saved using \code{ggsave()}.
 }
 \description{
-This function generates a single faceted ggplot object displaying
-Hidden Markov Model (HMM) inferred behavioral states for multiple
-individuals and days. Global X and Y axis titles are displayed for the
-entire faceted plot. Axis tick labels are shown on the outer panels
-as per ggplot2's default faceting behavior. Facet strip labels for 'day'
-are prefixed with "Day: ".
+Generates a multi-panel visualization of Hidden Markov Model inferred
+behavioral states across multiple individuals and days. Each panel shows
+the time-series of state assignments for one individual on one day, with
+states color-coded by activity level.
+
+This visualization is ideal for examining state dynamics across experimental
+conditions, comparing individuals, or assessing day-to-day consistency in
+sleep/wake patterns.
+}
+\details{
+\subsection{Color Palettes}{
+
+\strong{Default palette:}
+\itemize{
+\item State0 (active wake): #f75c46 (coral red)
+\item State1 (quiet wake): #ffa037 (orange)
+\item State2 (light sleep): #33c5e8 (light blue)
+\item State3 (deep sleep): #004a73 (dark blue)
+}
+
+\strong{AG palette:}
+\itemize{
+\item State0: #fb8500 (bright orange)
+\item State1: #ffb703 (yellow-orange)
+\item State2: #8ecae6 (sky blue)
+\item State3: #219ebc (ocean blue)
+}
+}
+
+\subsection{Faceting}{
+
+Panels are arranged using \code{facet_wrap(~ ID + day)} with:
+\itemize{
+\item Custom labeller adding "Day: " prefix to day numbers
+\item Shared axes across all panels
+\item Strip text showing individual ID and day
+}
+}
+
+\subsection{Performance}{
+
+For large datasets (many individuals/days), plot generation may take several
+seconds. Progress is shown via a progress bar during data preparation.
+}
 }
 \examples{
-# Assuming res1 is the output from HMMbehavr
-# faceted_plot <- HMMFacetedPlot(HMMinferList = res1, col_palette = "default")
-# print(faceted_plot)
+\dontrun{
+# Basic usage with default colors
+hmm_results <- HMMbehavr(processed_data)
+plot <- HMMFacetedPlot(hmm_results)
+print(plot)
+
+# Use alternative color palette
+plot_ag <- HMMFacetedPlot(hmm_results, col_palette = "AG")
+
+# Save to file
+ggsave("hmm_states_faceted.png", plot,
+       width = 12, height = 8, dpi = 300)
+
+# Further customize with ggplot2
+library(ggplot2)
+plot +
+  theme(strip.text = element_text(size = 8)) +
+  labs(title = "HMM Inferred States Across Individuals")
+
+# Focus on specific genotype
+results_filtered <- hmm_results
+results_filtered[[2]] <- results_filtered[[2]] \%>\%
+  filter(Genotype == "wildtype")
+plot_wt <- HMMFacetedPlot(results_filtered)
+}
+
+}
+\seealso{
+\code{\link{HMMplot}} for tile-based visualization
+\code{\link{HMMSinglePlot}} for individual plots saved to files
+\code{\link{HMMbehavr}} for generating input data
 }

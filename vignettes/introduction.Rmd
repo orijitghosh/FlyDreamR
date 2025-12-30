@@ -1,0 +1,173 @@
+---
+title: "Analyzing Sleep States with FlyDreamR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Analyzing Sleep States with FlyDreamR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Overview
+
+`FlyDreamR` is an R package designed for comprehensive analysis of *Drosophila* sleep data from Drosophila Activity Monitor (DAM) systems. The package provides:
+
+-   **Traditional sleep analysis** using customizable immobility thresholds
+-   **Hidden Markov Model (HMM)** based sleep state classification
+-   **Visualization tools** for sleep profiles, hypnograms, and activity patterns
+-   **Interactive Shiny app** for GUI-based analysis
+-   **High-performance computing** with parallelized HMM fitting
+
+## Installation
+
+You can install FlyDreamR from GitHub:
+
+```{r install, eval = FALSE}
+# Install devtools if you haven't already
+install.packages("devtools")
+
+# Install FlyDreamR from GitHub
+devtools::install_github("yourusername/FlyDreamR")
+```
+
+Or from a local tarball:
+
+```{r install_local, eval = FALSE}
+# Install additional dependencies
+install.packages(c("devtools", "ggplot2", "ggetho", "magrittr", "patchwork"))
+
+# Install from tarball
+d <- tempdir()
+untar("FlyDreamR_1.0.0.tar.gz", compressed = "gzip", exdir = d)
+devtools::install(file.path(d, "FlyDreamR"),
+                dependencies = TRUE,
+                repos = "https://cloud.r-project.org/")
+```
+
+## Loading the Package
+
+```{r library, eval = FALSE}
+library(FlyDreamR)
+library(ggplot2)
+library(magrittr)
+library(patchwork)
+```
+
+## Quick Start
+
+### 1. Prepare Your Metadata
+
+Convert your master file(s) to FlyDreamR-compatible metadata:
+
+```{r metadata, eval = FALSE}
+# Single master file
+metafile <- convMasterToMeta(
+metafile = "master35.txt",
+startDT = "2025-02-12 06:04:00",
+endDT = "2025-02-17 06:04:00"
+)
+
+# Multiple master files
+metafileBatch <- convMasterToMetaBatch(
+c("master35.txt", "master37.txt"),
+startDT = "2025-02-12 06:04:00",
+endDT = "2025-02-17 06:04:00"
+)
+```
+
+### 2. Load and Prepare DAM Data
+
+```{r prep, eval = FALSE}
+dt_test <- HMMDataPrep(
+  metafile_path = "Metadata_Block1Rep1Monitor35.csv",
+  result_dir = getwd(),
+  ldcyc = 12,
+  day_range = c(1, 2)
+)
+```
+
+### 3. Choose Your Analysis
+
+**Option A: Traditional Sleep Analysis**
+
+```{r trad, eval = FALSE}
+# Define sleep as 5+ minutes of immobility
+dt_trad <- HMMDataPrep(
+metafile_path = "Metadata_Block1Rep1Monitor35.csv",
+result_dir = getwd(),
+ldcyc = 12,
+day_range = c(1, 2),
+min_time_immobile = c(behavr::mins(5), behavr::mins(1440))
+)
+
+tradSleep <- calcTradSleep(dt_trad)
+```
+
+**Option B: HMM-Based Analysis**
+
+```{r hmm, eval = FALSE}
+# Fit HMMs (parallelized version)
+res <- HMMbehavrFast(
+behavtbl = dt_test,
+it = 100,
+ldcyc = 12,
+n_cores = 4
+)
+
+# Plot results
+HMMplot(res, color_palette = "AG")
+```
+
+## Key Features
+
+### Multiple Sleep Definitions
+
+Unlike traditional methods that rely on a single threshold, FlyDreamR allows you to:
+
+-   Define sleep using any immobility threshold (5 min, 10 min, 60 min, etc.)
+-   Use HMMs to identify multiple sleep states probabilistically
+-   Compare results across different definitions
+
+### Rich Visualizations
+
+-   **Somnograms**: Visualize sleep/wake patterns over time
+-   **Hypnograms**: HMM state heatmaps for all individuals
+-   **Population averages**: Compare genotypes or treatments
+-   **Customizable color palettes**: Built-in and user-defined options
+
+### High Performance
+
+-   Parallelized HMM fitting with `HMMbehavrFast()`
+-   Batch processing of multiple monitor files
+-   Efficient data structures using `behavr` tables
+
+## Next Steps
+
+-   See `vignette("traditional-sleep-analysis")` for detailed traditional analysis
+-   See `vignette("hmm-sleep-analysis")` for HMM-based approaches
+-   See `vignette("visualization")` for plotting options
+-   See `vignette("shiny-app")` for interactive analysis
+
+## Getting Help
+
+If you encounter issues or have questions:
+
+-   Check the function documentation: `?HMMbehavr`
+-   View examples: `example(HMMplot)`
+-   Contact the maintainer: [your email]
+-   Report bugs: [GitHub issues link]
+
+## Citation
+
+If you use FlyDreamR in your research, please cite:
+
+```         
+Ghosh, A. (2025). FlyDreamR: Comprehensive Sleep Analysis for Drosophila
+Activity Monitor Data. R package version 0.1.3.
+```
