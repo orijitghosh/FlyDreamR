@@ -243,7 +243,7 @@ For users who prefer a graphical interface, FlyDreamR includes a Shiny app:
 shiny::runApp("path/to/Shiny-FlyDreamR_1.0.0/")
 ```
 
-The GUI allows you to: 1. Upload and convert master files interactively. 2. Configure analysis parameters via dropdown menus. 3. Run both traditional and HMM analyses. 4. Generate and download plots. 5. Export results as CSV files
+The GUI allows you to: 1. Upload and convert master files interactively. 2. Configure analysis parameters via dropdown menus. 3. Run both traditional and HMM analyses. 4. Generate and download plots. 5. Export results as CSV files.
 
 ------------------------------------------------------------------------
 
