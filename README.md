@@ -32,7 +32,7 @@ install.packages(c('devtools','remotes'), repos='https://cloud.r-project.org')
 remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
 
 # Pin to a specific release
-remotes::install_github('orijitghosh/FlyDreamR@v0.1.3', upgrade = 'never')
+remotes::install_github('orijitghosh/FlyDreamR@v1.0.0', upgrade = 'never')
 ```
 
 ### From source (local installation)
@@ -43,7 +43,7 @@ install.packages(c("devtools", "ggplot2", "ggetho", "magrittr", "patchwork"))
 
 # Create a temporary directory and extract the package source code
 d <- tempdir()
-untar("FlyDreamR_0.1.3.tar.gz", compressed="gzip", exdir=d)
+untar("FlyDreamR_1.0.0.tar.gz", compressed="gzip", exdir=d)
 
 # Build the package from source
 devtools::install(file.path(d, "FlyDreamR"), dependencies=TRUE, 
@@ -243,7 +243,7 @@ For users who prefer a graphical interface, FlyDreamR includes a Shiny app:
 shiny::runApp("path/to/Shiny-FlyDreamR_1.0.0/")
 ```
 
-The GUI allows you to: 1. Upload and convert master files interactively, 2. Configure analysis parameters via dropdown menus, 3. Run both traditional and HMM analyses, 4. Generate and download plots, and 5. Export results as CSV files
+The GUI allows you to: 1. Upload and convert master files interactively. 2. Configure analysis parameters via dropdown menus. 3. Run both traditional and HMM analyses. 4. Generate and download plots. 5. Export results as CSV files
 
 ------------------------------------------------------------------------
 
