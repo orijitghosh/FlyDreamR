@@ -1,6 +1,6 @@
 # FlyDreamR <img src="https://img.shields.io/badge/R-%3E%3D%204.0-276DC3" align="right"/>
 
-<img src="/FlyDreamR_logo.png" alt="FlyDreamR logo" width="200" align="right"/>
+<img src="vignettes/FlyDreamR_logo.png" alt="FlyDreamR logo" width="200" align="right"/>
 
 > **Run the Ghosh–Harbison hidden Markov model on Activity Counts to Infer Sleep/Wake States**
 

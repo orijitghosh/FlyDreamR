@@ -1,0 +1,66 @@
+url: https://orijitghosh.github.io/FlyDreamR/ # Replace with your actual URL
+
+template:
+  bootstrap: 5
+  bootswatch: flatly # "flatly", "sandstone", or "spacelab" look great for scientific tools
+  params:
+    logo: vigenttes/FlyDreamR_logo.png
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [github]
+  components:
+    intro:
+      text: "Get Started"
+      href: articles/introduction.html  # UPDATED: Points to your specific vignette
+    github:
+      icon: fab fa-github
+      href: https://github.com/orijitghosh/FlyDreamR # Replace with your repo link
+
+# This section tells pkgdown how to organize your articles dropdown
+articles:
+  - title: "Vignettes"
+    contents:
+      - introduction
+
+reference:
+  - title: "Metadata & Data Import"
+    desc: >
+      Functions to convert raw master files into the metadata format required
+      to link experimental conditions with monitor files.
+    contents:
+      - convMasterToMeta
+      - convMasterToMetaBatch
+
+  - title: "Data Preparation"
+    desc: >
+      Functions to load DAM activity data, link it with metadata, and
+      calculate normalized activity and phases.
+    contents:
+      - HMMDataPrep
+      - HMMDataPrepSD
+
+  - title: "HMM Analysis"
+    desc: >
+      The core functions for running Hidden Markov Models to infer
+      sleep/wake states.
+    contents:
+      - HMMbehavr
+      - HMMbehavrFast
+
+  - title: "Visualization"
+    desc: >
+      Tools for visualizing inferred states using heatmaps, faceted plots,
+      or individual profiles.
+    contents:
+      - HMMplot
+      - HMMFacetedPlot
+      - HMMSinglePlot
+
+  - title: "Traditional Metrics"
+    desc: >
+      Functions to calculate standard sleep metrics (immobility bouts)
+      for comparison with HMM results.
+    contents:
+      - calcTradSleep
