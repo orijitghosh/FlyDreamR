@@ -2,7 +2,6 @@
 
 export("%>%")
 export(HMMDataPrep)
-export(HMMDataPrepSD)
 export(HMMFacetedPlot)
 export(HMMSinglePlot)
 export(HMMbehavr)

@@ -1,13 +1,13 @@
 Type: Package
 Package: FlyDreamR
-Title: Run the Ghosh–Harbison Hidden Markov Model on Activity Counts to Infer Sleep/Wake States
+Title: Infer Sleep/Wake States from activity data using hidden Markov models (HMMs)
 Version: 1.0.0
 Authors@R: 
   person("Arijit", "Ghosh", email = "arijitghosh2009@gmail.com",
          role = c("aut","cre"), comment = c(ORCID = "0000-0002-7910-3170"))
 Description: Implements the Ghosh–Harbison hidden Markov model for inferring sleep and wake states from activity-count data, plus tools for data preparation, visualization, and summary metrics.
 License: GPL (>= 3)
-URL: https://github.com/orijitghosh/FlyDreamR
+URL: https://orijitghosh.github.io/FlyDreamR
 BugReports: https://github.com/orijitghosh/FlyDreamR/issues
 Depends: R (>= 4.0)
 Imports:

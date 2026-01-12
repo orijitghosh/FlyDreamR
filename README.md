@@ -2,7 +2,7 @@
 
 <img src="vignettes/FlyDreamR_logo.png" alt="FlyDreamR logo" width="200" align="right"/>
 
-> **Run the Ghosh–Harbison hidden Markov model on Activity Counts to Infer Sleep/Wake States**
+> **Infer Sleep/Wake States from activity data using hidden Markov models (HMMs)**
 
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html) [![License: GPL-3](https://img.shields.io/badge/License-GPL--3-blue.svg)](LICENSE) [![Repo status](https://img.shields.io/badge/status-active-success)](#) [![Issues](https://img.shields.io/github/issues/orijitghosh/FlyDreamR.svg)](https://github.com/orijitghosh/FlyDreamR/issues)
 

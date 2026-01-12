@@ -1,12 +1,16 @@
-url: https://orijitghosh.github.io/FlyDreamR/ # Replace with your actual URL
+url: https://orijitghosh.github.io/FlyDreamR/ # Replace with my actual URL
 
 template:
   bootstrap: 5
-  bootswatch: flatly # "flatly", "sandstone", or "spacelab" look great for scientific tools
+  # bootswatch: minty # "ayu-light"
+  light-switch: true
+  theme: ayu-light
+  theme-dark: ayu-dark
   params:
-    logo: vigenttes/FlyDreamR_logo.png
+    logo: vignettes/FlyDreamR_logo.png
 
 navbar:
+  bg: primary
   structure:
     left:  [intro, reference, articles, news]
     right: [github]
@@ -20,9 +24,18 @@ navbar:
 
 # This section tells pkgdown how to organize your articles dropdown
 articles:
-  - title: "Vignettes"
+  - title: Get started
+    navbar: ~
     contents:
       - introduction
+
+  - title: Workflows
+    navbar: ~
+    contents:
+      - data-prep
+      - traditional-sleep
+      - hmm-workflow
+      - shiny-app
 
 reference:
   - title: "Metadata & Data Import"
@@ -39,7 +52,6 @@ reference:
       calculate normalized activity and phases.
     contents:
       - HMMDataPrep
-      - HMMDataPrepSD
 
   - title: "HMM Analysis"
     desc: >

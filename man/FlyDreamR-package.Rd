@@ -23,7 +23,7 @@ Important functions in this package:
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/orijitghosh/FlyDreamR}
+  \item \url{https://orijitghosh.github.io/FlyDreamR}
   \item Report bugs at \url{https://github.com/orijitghosh/FlyDreamR/issues}
 }
 

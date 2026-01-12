@@ -1,0 +1,76 @@
+---
+title: "Getting data into FlyDreamR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting data into FlyDreamR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+This vignette covers the **input files** FlyDreamR expects and the standard workflow to convert DAM outputs into a
+`behavr`-style table that downstream functions can consume.
+
+## DAM files and metadata
+
+A typical DAM experiment produces:
+
+- A **master file** (experiment-level setup + sample sheet)
+- One or more **monitor files** (time series activity counts)
+
+FlyDreamR converts the master file into a metadata CSV, then uses that metadata to load/bind monitor data for analysis.
+
+## 1) Convert a master file to FlyDreamR metadata
+
+Use `convMasterToMeta()` for a single master file, or `convMasterToMetaBatch()` to combine multiple master files into one metadata table.
+
+```{r}
+# Single master file -> metadata CSV
+metafile <- convMasterToMeta(
+  metafile = "master1.txt",
+  startDT  = "2025-02-12 06:04:00",
+  endDT    = "2025-02-17 06:04:00"
+)
+
+# Multiple master files -> merged metadata CSV
+metafileBatch <- convMasterToMetaBatch(
+  c("master1.txt", "master2.txt"),
+  startDT = "2025-02-12 06:04:00",
+  endDT   = "2025-02-17 06:04:00"
+)
+```
+
+**Tip:** For package examples, consider shipping small demo files in `inst/extdata/` and locating them via:
+
+```{r}
+# master_path <- system.file("extdata", "master35.txt", package = "FlyDreamR")
+```
+
+## 2) Load/bind monitor data for analysis
+
+Use `HMMDataPrep()` to load the monitor file(s) associated with a metadata CSV and generate a cleaned dataset.
+
+```{r}
+dt <- HMMDataPrep(
+  metafile_path = "Metadata_Monitor1.csv",
+  result_dir    = getwd(),
+  ldcyc         = 12,
+  day_range     = c(1, 2)
+)
+
+dt
+```
+
+The resulting table can be passed into:
+
+- `calcTradSleep()` for traditional sleep metrics
+- `HMMbehavr()` / `HMMbehavrFast()` for HMM fitting

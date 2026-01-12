@@ -2,17 +2,17 @@ citHeader("To cite FlyDreamR in publications use:")
 
 bibentry(
   bibtype  = "Manual",
-  title    = "FlyDreamR: Hidden Markov Model-Based Sleep State Inference for Drosophila",
+  title    = "Inferring the genetic basis of sleep states in Drosophila melanogaster using Hidden Markov models",
   author   = c(person("Arijit", "Ghosh", email = "arijitghosh2009@gmail.com")),
   year     = "2025",
   note     = "R package version 1.0.0",
-  url      = "https://github.com/yourusername/FlyDreamR"
+  url      = "https://github.com/orijitghosh/FlyDreamR"
 )
 
 # Add actual publication after acceptance:
 # bibentry(
 #   bibtype  = "Article",
-#   title    = "Hidden Markov models reveal heterogeneous sleep states in Drosophila",
+#   title    = "Inferring the genetic basis of sleep states in Drosophila melanogaster using Hidden Markov models",
 #   author   = c(person("Arijit", "Ghosh"), person("Susan T.", "Harbison")),
 #   journal  = "Journal Name",
 #   year     = "2025",
