@@ -82,6 +82,19 @@ This is typically the first step in the FlyDreamR workflow, converting raw
 DAM files into a standardized format suitable for \code{\link{HMMbehavr}}.
 }
 \details{
+\subsection{Metadata File Format**}{
+
+The \code{metadata_file} must be a CSV with one row per fly (channel) and the following columns:
+\describe{
+\item{\code{file}}{Full filename of the raw monitor file (e.g., "Monitor1.txt").}
+\item{\code{start_datetime}}{Experiment start timestamp ("YYYY-MM-DD HH:MM:SS").}
+\item{\code{stop_datetime}}{Experiment end timestamp ("YYYY-MM-DD HH:MM:SS").}
+\item{\code{region_id}}{Channel number (1-32) on the DAM monitor.}
+\item{\code{genotype}}{Experimental genotype identifier.}
+\item{\code{replicate}}{Replicate number (integer). Use a random number if not applicable.}
+}
+}
+
 \subsection{Activity Normalization}{
 
 \code{normact} represents activity as a percentage of total daily activity:

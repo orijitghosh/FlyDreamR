@@ -25,10 +25,13 @@ FlyDreamR lets you define sleep as immobility bouts of a minimum duration (e.g.,
 Start by preparing the dataset with `HMMDataPrep()` and a chosen `min_time_immobile` definition.
 
 ```{r}
+# Load demo data
+meta_file <- system.file("extdata", "Metadata_Monitor1.csv", package = "FlyDreamR")
+data_dir <- system.file("extdata", package = "FlyDreamR")
 # 5-minute sleep definition
 dt_5min <- HMMDataPrep(
-  metafile_path      = "Metadata_Block1Rep1Monitor35.csv",
-  result_dir         = getwd(),
+  metafile_path = meta_file,
+  result_dir    = data_dir,
   ldcyc              = 12,
   day_range          = c(1, 2),
   min_time_immobile  = c(behavr::mins(5), behavr::mins(1440))
@@ -41,8 +44,8 @@ trad_5min
 ```{r}
 # 60-minute sleep definition
 dt_60min <- HMMDataPrep(
-  metafile_path      = "Metadata_Block1Rep1Monitor35.csv",
-  result_dir         = getwd(),
+  metafile_path = meta_file,
+  result_dir    = data_dir,
   ldcyc              = 12,
   day_range          = c(1, 2),
   min_time_immobile  = c(behavr::mins(60), behavr::mins(1440))

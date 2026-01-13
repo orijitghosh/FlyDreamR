@@ -1,0 +1,78 @@
+/* Add padding to the bottom of the body to prevent the fixed footer from overlapping content */
+body {
+  padding-bottom: 60px; /* Must be slightly larger than footer height */
+}
+
+.field {
+    margin-bottom: 1rem;
+}
+
+.nes-container:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+i.brand {
+  margin-right: 1rem;
+}
+
+div.nes-containers > .nes-container {
+  display: inline-block;
+  max-width: 400px;
+}
+
+.nes-balloon.container .nes-balloon {
+  max-width: 600px;
+  margin: 2rem 2rem;
+}
+
+.nes-balloon.container .messages {
+  display: flex;
+  flex-direction: column;
+}
+.nes-balloon.container .message {
+  display: flex;
+}
+.nes-balloon.container .message i {
+  align-self: flex-end;
+}
+.nes-balloon.container .message.-left {
+  align-self: flex-start;
+}
+.nes-balloon.container .message.-right {
+  align-self: flex-end;
+}
+
+.form.container > .field:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+.footer {
+  text-align: center;
+}
+.footer a {
+  color: #333;
+  text-decoration: none;
+}
+
+.github-link {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 999;
+  display: flex;
+  height: 100px;
+  color: #333;
+  text-decoration: none;
+}
+.github-link:hover {
+  text-decoration: none;
+}
+.github-link > p.balloon {
+  align-self: flex-start;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  color: #333;
+}
+.github-link > i.octocat {
+  align-self: flex-end;
+}

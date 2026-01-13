@@ -17,17 +17,42 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette covers the **input files** FlyDreamR expects and the standard workflow to convert DAM outputs into a
-`behavr`-style table that downstream functions can consume.
+This vignette covers the **input files** FlyDreamR expects and the standard workflow to convert DAM outputs into a `behavr`-style table that downstream functions can consume.
 
 ## DAM files and metadata
 
 A typical DAM experiment produces:
 
-- A **master file** (experiment-level setup + sample sheet)
-- One or more **monitor files** (time series activity counts)
+-   A **master file** or a **metadata file** (experiment-level setup + sample sheet)
+-   One or more **monitor files** (time series activity counts)
 
-FlyDreamR converts the master file into a metadata CSV, then uses that metadata to load/bind monitor data for analysis.
+## Metadata File Format
+
+The most critical step in data preparation is creating a **metadata CSV file**. This file maps the raw monitor files (channels 1–32) to your specific experimental conditions (Genotype, Sex, etc.) and defines the exact start and stop times for the experiment.
+
+The file must contain the following columns:
+
+| Column Header | Description | Example |
+|:-----------------------|:-----------------------|:-----------------------|
+| **`file`** | The full filename of the DAM monitor file (including extension). | `Monitor1.txt` |
+| **`start_datetime`** | Experiment start timestamp (`YYYY-MM-DD HH:MM:SS`). | `2025-02-12 06:04:00` |
+| **`stop_datetime`** | Experiment end timestamp (`YYYY-MM-DD HH:MM:SS`). | `2025-02-15 09:00:00` |
+| **`region_id`** | The channel number (1–32) on the monitor. | `1` |
+| **`genotype`** | Experimental genotype or condition identifier. | `CantonS` |
+| **`replicate`** | Replicate number (integer). Use a random number if not applicable. | `1` |
+
+### Example Metadata
+
+You can create this file in Excel or a text editor. Here is an example of what the contents should look like:
+
+``` csv
+file,start_datetime,stop_datetime,region_id,genotype,replicate
+Monitor1.txt,2025-02-12 06:04:00,2025-02-15 09:00:00,1,CantonS,1
+Monitor1.txt,2025-02-12 06:04:00,2025-02-15 09:00:00,2,w1118,1
+Monitor2.txt,2025-02-12 06:04:00,2025-02-15 09:00:00,1,iso31,2
+```
+
+FlyDreamR converts the master file into a metadata CSV, then uses that metadata to load/bind monitor data for analysis. Most of you will create a **Metadata** file, and not have the **Master** file, so you may move to Step 2 directly.
 
 ## 1) Convert a master file to FlyDreamR metadata
 
@@ -49,20 +74,17 @@ metafileBatch <- convMasterToMetaBatch(
 )
 ```
 
-**Tip:** For package examples, consider shipping small demo files in `inst/extdata/` and locating them via:
-
-```{r}
-# master_path <- system.file("extdata", "master35.txt", package = "FlyDreamR")
-```
-
 ## 2) Load/bind monitor data for analysis
 
-Use `HMMDataPrep()` to load the monitor file(s) associated with a metadata CSV and generate a cleaned dataset.
+Use `HMMDataPrep()` to load the monitor file(s) associated with a metadata CSV and generate a cleaned dataset. Demo dataset has been provided.
 
 ```{r}
+# Load demo data
+meta_file <- system.file("extdata", "Metadata_Monitor1.csv", package = "FlyDreamR")
+data_dir <- system.file("extdata", package = "FlyDreamR")
 dt <- HMMDataPrep(
-  metafile_path = "Metadata_Monitor1.csv",
-  result_dir    = getwd(),
+  metafile_path = meta_file,
+  result_dir    = data_dir,
   ldcyc         = 12,
   day_range     = c(1, 2)
 )
@@ -72,5 +94,5 @@ dt
 
 The resulting table can be passed into:
 
-- `calcTradSleep()` for traditional sleep metrics
-- `HMMbehavr()` / `HMMbehavrFast()` for HMM fitting
+-   `calcTradSleep()` for traditional sleep metrics
+-   `HMMbehavr()` / `HMMbehavrFast()` for HMM fitting

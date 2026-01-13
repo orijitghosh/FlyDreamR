@@ -21,22 +21,12 @@ FlyDreamR can be used entirely from the console, but it also ships with a Shiny 
 
 ## Launch the app
 
-If the Shiny app directory is installed with the package, you can usually locate it via `system.file()`.
-(If you keep the app outside the package, point `runApp()` at that folder instead.)
-
-```{r}
-# Preferred (if bundled in the package)
-app_dir <- system.file("Shiny-FlyDreamR", package = "FlyDreamR")
-shiny::runApp(app_dir)
-```
-
-In the original demo workflow, the app was launched from a local folder path:
-
-```{r}
-shiny::runApp("PATH/TO/APP/Shiny-FlyDreamR_1.0.0/")
+``` r
+##Launch the interactive interface
+runFlyDreamRApp()
 ```
 
 ## Notes
 
-- The first launch may install additional packages (depending on how the app is configured).
-- For intramural/shared use, the app can also be deployed to a Shiny Server / Posit Connect environment.
+-   The first launch may install additional packages (depending on how the app is configured).
+-   For intramural/shared use, the app can also be deployed to a Shiny Server / Posit Connect environment.

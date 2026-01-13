@@ -3,8 +3,9 @@ citHeader("To cite FlyDreamR in publications use:")
 bibentry(
   bibtype  = "Manual",
   title    = "Inferring the genetic basis of sleep states in Drosophila melanogaster using Hidden Markov models",
-  author   = c(person("Arijit", "Ghosh", email = "arijitghosh2009@gmail.com")),
-  year     = "2025",
+  author   = c(person("Arijit", "Ghosh", email = "arijitghosh2009@gmail.com"),
+             person("Susan T.", "Harbison", email = "susan.harbison.nih.gov")),
+  year     = "2026",
   note     = "R package version 1.0.0",
   url      = "https://github.com/orijitghosh/FlyDreamR"
 )

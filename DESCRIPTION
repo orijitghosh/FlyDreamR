@@ -1,36 +1,49 @@
 Type: Package
 Package: FlyDreamR
-Title: Infer Sleep/Wake States from activity data using hidden Markov models (HMMs)
+Title: Infer Sleep/Wake States from activity data using hidden Markov
+    models (HMMs)
 Version: 1.0.0
 Authors@R: 
-  person("Arijit", "Ghosh", email = "arijitghosh2009@gmail.com",
-         role = c("aut","cre"), comment = c(ORCID = "0000-0002-7910-3170"))
-Description: Implements the Ghosh–Harbison hidden Markov model for inferring sleep and wake states from activity-count data, plus tools for data preparation, visualization, and summary metrics.
+    person("Arijit", "Ghosh", , "arijitghosh2009@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-7910-3170"))
+Description: Implements an iterative hidden Markov model for
+    inferring sleep and wake states from activity-count data, plus tools
+    for data preparation, visualization, and summary metrics.
 License: GPL (>= 3)
 URL: https://orijitghosh.github.io/FlyDreamR
 BugReports: https://github.com/orijitghosh/FlyDreamR/issues
-Depends: R (>= 4.0)
+Depends: 
+    R (>= 4.0)
 Imports:
-  behavr,
-  cli,
-  damr,
-  data.table,
-  depmixS4,
-  doParallel,
-  dplyr,
-  foreach,
-  ggplot2,
-  magrittr,
-  reshape2,
-  sleepr,
-  tictoc,
-  tidyfast,
-  tidyr,
-  RColorBrewer,
-  lubridate,
-  rlang,
-  scales,
-  parallel
+    behavr,
+    bslib,
+    cli,
+    damr,
+    data.table,
+    depmixS4,
+    doParallel,
+    dplyr,
+    DT,
+    foreach,
+    ggplot2,
+    lubridate,
+    magrittr,
+    parallel,
+    RColorBrewer,
+    reshape2,
+    rlang,
+    scales,
+    shiny,
+    shinyalert,
+    shinycssloaders,
+    shinydashboard,
+    shinyhelper,
+    shinyjs,
+    shinyWidgets,
+    sleepr,
+    tictoc,
+    tidyfast,
+    tidyr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

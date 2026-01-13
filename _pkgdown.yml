@@ -2,25 +2,25 @@ url: https://orijitghosh.github.io/FlyDreamR/ # Replace with my actual URL
 
 template:
   bootstrap: 5
-  # bootswatch: minty # "ayu-light"
+  bootswatch: zephyr
   light-switch: true
-  theme: ayu-light
+  theme: ayu-light # Code highlighting theme
   theme-dark: ayu-dark
   params:
     logo: vignettes/FlyDreamR_logo.png
 
 navbar:
-  bg: primary
   structure:
     left:  [intro, reference, articles, news]
-    right: [github]
+    right: [search, github, lightswitch]
   components:
     intro:
       text: "Get Started"
-      href: articles/introduction.html  # UPDATED: Points to your specific vignette
+      href: articles/introduction.html
     github:
       icon: fab fa-github
-      href: https://github.com/orijitghosh/FlyDreamR # Replace with your repo link
+      href: https://github.com/orijitghosh/FlyDreamR
+      aria-label: GitHub
 
 # This section tells pkgdown how to organize your articles dropdown
 articles:
@@ -76,3 +76,9 @@ reference:
       for comparison with HMM results.
     contents:
       - calcTradSleep
+
+  - title: "Interactive Analysis"
+    desc: >
+      Functions to launch the graphical user interface (Shiny App).
+    contents:
+      - runFlyDreamRApp
