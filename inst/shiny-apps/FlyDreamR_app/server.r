@@ -207,7 +207,8 @@ shinyServer(function(input, output, session) {
     },
     content = function(file) {
       req(results$res1) # Require results$res1 to exist
-      write.csv(results$res1$TimeSpentInEachState, file, row.names = FALSE)
+      write.csv(results$res1$TimeSpentInEachState %>% dplyr::select(-c(file_info, experiment_id)),
+                file, row.names = FALSE, quote = FALSE)
     }
   )
 
@@ -217,7 +218,8 @@ shinyServer(function(input, output, session) {
     },
     content = function(file) {
       req(results$res1) # Require results$res1 to exist
-      write.csv(results$res1$VITERBIDecodedProfile, file, row.names = FALSE)
+      write.csv(results$res1$VITERBIDecodedProfile%>% dplyr::select(-c(file_info, experiment_id)),
+                file, row.names = FALSE, quote = FALSE)
     }
   )
 })
