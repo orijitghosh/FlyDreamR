@@ -25,7 +25,7 @@ pipeline:
   metrics.
 
 For detailed guides and walk through, visit
-www.orijitghosh.github.io/FlyDreamR.
+<https://orijitghosh.github.io/FlyDreamR/>.
 
 ------------------------------------------------------------------------
 
