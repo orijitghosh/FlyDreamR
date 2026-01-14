@@ -15,7 +15,7 @@ must be a data frame containing the \code{VITERBIDecodedProfile} with columns:
 \item \code{day}: Day number
 \item \code{timestamp}: Time point index (1 to 1440 for minute resolution)
 \item \code{state_name}: State label (State0, State1, State2, State3)
-\item \code{Genotype}: Genotype identifier
+\item \code{genotype}: Genotype identifier
 }}
 
 \item{col_palette}{Character string specifying the color palette. Options:
@@ -110,7 +110,7 @@ plot +
 # Focus on specific genotype
 results_filtered <- hmm_results
 results_filtered[[2]] <- results_filtered[[2]] \%>\%
-  filter(Genotype == "wildtype")
+  filter(genotype == "wildtype")
 plot_wt <- HMMFacetedPlot(results_filtered)
 }
 

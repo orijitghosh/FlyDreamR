@@ -18,7 +18,7 @@
 #'     \item \code{day}: Day number
 #'     \item \code{timestamp}: Time point index (1 to 1440 for minute resolution)
 #'     \item \code{state_name}: State label (State0, State1, State2, State3)
-#'     \item \code{Genotype}: Genotype identifier
+#'     \item \code{genotype}: Genotype identifier
 #'   }
 #' @param col_palette Character string specifying the color palette. Options:
 #'   \describe{
@@ -95,7 +95,7 @@
 #' # Focus on specific genotype
 #' results_filtered <- hmm_results
 #' results_filtered[[2]] <- results_filtered[[2]] %>%
-#'   filter(Genotype == "wildtype")
+#'   filter(genotype == "wildtype")
 #' plot_wt <- HMMFacetedPlot(results_filtered)
 #' }
 #'
@@ -114,7 +114,7 @@ HMMFacetedPlot <- function(HMMinferList, col_palette = "default") {
   source_data <- as.data.frame(HMMinferList[[2]])
 
   # Check for required columns
-  required_cols <- c("ID", "day", "timestamp", "state_name", "Genotype")
+  required_cols <- c("ID", "day", "timestamp", "state_name", "genotype")
   if (!all(required_cols %in% colnames(source_data))) {
     missing_cols_str <- paste(setdiff(required_cols, colnames(source_data)), collapse = ", ")
     stop(paste("Missing one or more required columns in HMMinferList[[2]]:", missing_cols_str), call. = FALSE)

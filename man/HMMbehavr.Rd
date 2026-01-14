@@ -10,6 +10,8 @@ HMMbehavr(behavtbl, it = 100, ldcyc = NULL)
 \item{behavtbl}{A \code{behavr} table (data.frame/data.table) containing
 behavioral data. Must include columns: \code{id}, \code{day}, \code{normact}
 (normalized activity), \code{genotype}, and \code{t} (time in seconds).
+Additional metadata columns (e.g., \code{sex}, \code{treatment}) will be
+automatically included in output summaries.
 Typically the output from \code{\link{HMMDataPrep}}.}
 
 \item{it}{Integer specifying the number of HMM fitting iterations per
@@ -36,6 +38,7 @@ each state, grouped by:
 \item \code{phase}: Light or dark phase
 \item \code{state_name}: State0, State1, State2, or State3
 \item \code{time_spent}: Minutes in that state
+\item Additional metadata columns (e.g., \code{sex}, \code{treatment})
 }
 All state-phase combinations are present (filled with 0 if not observed).
 }
@@ -46,6 +49,7 @@ All state-phase combinations are present (filled with 0 if not observed).
 \item \code{state_name}: Activity-ordered state name (State0-State3)
 \item \code{phase}: Light or dark
 \item \code{ID}, \code{Genotype}, \code{day}: Grouping variables
+\item Additional metadata columns (e.g., \code{sex}, \code{treatment})
 }
 }
 }
@@ -106,15 +110,15 @@ hmm_results <- HMMbehavr(
   ldcyc = 16          # LD 16:8 cycle
 )
 
-# Access results
+# Access results with additional metadata
 time_in_states <- hmm_results$TimeSpentInEachState
 state_profile <- hmm_results$VITERBIDecodedProfile
 
-# Summarize sleep (State2 + State3)
+# Summarize sleep by sex and genotype
 library(dplyr)
 sleep_summary <- time_in_states \%>\%
   filter(state_name \%in\% c("State2", "State3")) \%>\%
-  group_by(ID, day, phase) \%>\%
+  group_by(Genotype, sex, day, phase) \%>\%
   summarise(total_sleep_min = sum(time_spent))
 }
 

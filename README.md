@@ -73,7 +73,8 @@ To link your raw monitor files with experimental conditions, you must create a *
 | **`stop_datetime`** | The exact date and time the experiment ended. | `2025-02-15 09:00:00` |
 | **`region_id`** | The specific channel number (1–32) on the DAM monitor for this fly. | `1` |
 | **`genotype`** | The experimental genotype identifier or treatment group. | `CantonS` |
-| **`replicate`** | The replicate number. (Note: If you do not have replicates, use a random integer; this does not affect calculations). | `1` |
+| **`replicate`** | The replicate identifier. (Note: If you do not have replicates, that does not affect calculations). | `1` |
+| **`sex`** | The sex identifier. (Note: If you do not different sexes, that does not affect calculations). | `Female` |
 
 ------------------------------------------------------------------------
 

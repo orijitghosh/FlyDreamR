@@ -15,6 +15,8 @@
 #' @param behavtbl A \code{behavr} table (data.frame/data.table) containing
 #'   behavioral data. Must include columns: \code{id}, \code{day}, \code{normact}
 #'   (normalized activity), \code{genotype}, and \code{t} (time in seconds).
+#'   Additional metadata columns (e.g., \code{sex}, \code{treatment}) will be
+#'   automatically included in output summaries.
 #'   Typically the output from \code{\link{HMMDataPrep}}.
 #' @param it Integer specifying the number of HMM fitting iterations per
 #'   individual per day. Must be >= 100 (enforced). Higher values increase
@@ -38,6 +40,7 @@
 #'         \item \code{phase}: Light or dark phase
 #'         \item \code{state_name}: State0, State1, State2, or State3
 #'         \item \code{time_spent}: Minutes in that state
+#'         \item Additional metadata columns (e.g., \code{sex}, \code{treatment})
 #'       }
 #'       All state-phase combinations are present (filled with 0 if not observed).
 #'     }
@@ -48,6 +51,7 @@
 #'         \item \code{state_name}: Activity-ordered state name (State0-State3)
 #'         \item \code{phase}: Light or dark
 #'         \item \code{ID}, \code{Genotype}, \code{day}: Grouping variables
+#'         \item Additional metadata columns (e.g., \code{sex}, \code{treatment})
 #'       }
 #'     }
 #'   }
@@ -89,15 +93,15 @@
 #'   ldcyc = 16          # LD 16:8 cycle
 #' )
 #'
-#' # Access results
+#' # Access results with additional metadata
 #' time_in_states <- hmm_results$TimeSpentInEachState
 #' state_profile <- hmm_results$VITERBIDecodedProfile
 #'
-#' # Summarize sleep (State2 + State3)
+#' # Summarize sleep by sex and genotype
 #' library(dplyr)
 #' sleep_summary <- time_in_states %>%
 #'   filter(state_name %in% c("State2", "State3")) %>%
-#'   group_by(ID, day, phase) %>%
+#'   group_by(Genotype, sex, day, phase) %>%
 #'   summarise(total_sleep_min = sum(time_spent))
 #' }
 #'
@@ -138,6 +142,16 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
       failed_cases <<- data.frame(ID = character(), Day = numeric(), ErrorMessage = character(), stringsAsFactors = FALSE)
 
       dt_hmm <- behavtbl
+
+      # --- Extract metadata lookup table ---
+      # Define technical columns that are not metadata
+      tech_cols <- c("t", "activity", "normact", "moving", "asleep", "phase", "state", "state_name")
+
+      # Create metadata lookup table (one row per id/day combination)
+      meta_lookup <- behavtbl %>%
+        dplyr::select(-dplyr::any_of(tech_cols)) %>%
+        dplyr::distinct(id, day, .keep_all = TRUE)
+
       total_iterations <- length(unique(dt_hmm$id)) * length(unique(dt_hmm$day)) * it
 
       # Set up a progress bar
@@ -202,13 +216,13 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
                       transition_matrix <- matrix(
                         c(
                           rep(c(rep(((1 - (2 * epsilon)) / (num_states - 1)),
-                            times = (num_states - 1)
+                                    times = (num_states - 1)
                           ), epsilon), times = upper_boundary_rows),
                           (tryCatch(rep(rep((1 / num_states), num_states), middle_rows),
-                            error = function(e) NULL
+                                    error = function(e) NULL
                           )),
                           rep(c(epsilon, rep(((1 - (2 * epsilon)) / (num_states - 1)),
-                            times = (num_states - 1)
+                                             times = (num_states - 1)
                           )), times = lower_boundary_rows)
                         ),
                         nrow = num_states, ncol = num_states,
@@ -228,11 +242,11 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
                       # Fit the HMM
                       fitted_model <- tryCatch(
                         depmixS4::fit(model,
-                          verbose = FALSE,
-                          emcontrol = depmixS4::em.control(
-                            classification = "soft",
-                            random.start = TRUE
-                          )
+                                      verbose = FALSE,
+                                      emcontrol = depmixS4::em.control(
+                                        classification = "soft",
+                                        random.start = TRUE
+                                      )
                         ),
                         error = function(e) NULL
                       )
@@ -263,13 +277,13 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
                         if (!is.null(ldcyc) && is.numeric(ldcyc) && length(ldcyc) == 1) {
                           light_duration_hours <- ldcyc
                           viterbi_path$phase <- ifelse(hmm_data$t %% behavr::hours(24) < behavr::hours(light_duration_hours),
-                            "light", "dark"
+                                                       "light", "dark"
                           )
                         } else {
                           # Default: 12 hours light
                           light_duration_hours <- 12
                           viterbi_path$phase <- ifelse(hmm_data$t %% behavr::hours(24) < behavr::hours(light_duration_hours),
-                            "light", "dark"
+                                                       "light", "dark"
                           )
                         }
                         viterbi_path$timestamp <- seq_len(nrow(viterbi_path))
@@ -310,15 +324,15 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
                 # If a valid solution was found in the inner loop, add it to the collection
                 if (exists("iteration_results", inherits = FALSE)) {
                   iteration_results[[2]]$ID <- individual_id
-                  iteration_results[[2]]$Genotype <- as.character(unique(dt_individual_day$genotype))
                   iteration_results[[2]]$day <- day_number
                   iteration_results[[2]]$iter <- iteration
+
                   profile_iterations <- rbind(profile_iterations, iteration_results[[2]])
 
                   iteration_results[[3]]$ID <- individual_id
-                  iteration_results[[3]]$Genotype <- as.character(unique(dt_individual_day$genotype))
                   iteration_results[[3]]$day <- day_number
                   iteration_results[[3]]$iter <- iteration
+
                   transitions_iterations <- rbind(transitions_iterations, iteration_results[[3]])
                 }
               } # End of iteration loop
@@ -326,7 +340,7 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
               # Summarize results ONLY if at least one iteration was successful.
               if (nrow(profile_iterations) > 0) {
                 profile_summary <- profile_iterations %>%
-                  dplyr::group_by(timestamp, phase, day, ID, Genotype) %>%
+                  dplyr::group_by(timestamp, phase, day, ID) %>%
                   dplyr::count(state_name) %>%
                   dplyr::slice(which.max(n)) %>%
                   dplyr::mutate(error_score = (1 - (n / it)) * 100) %>%
@@ -355,7 +369,7 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
                     )
                   )
 
-                  # Skip adding this day’s results to the final data frames
+                  # Skip adding this day's results to the final data frames
                   next
                 }
                 # ===== end check =====
@@ -363,8 +377,8 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
                 profile_all_states <- rbind(profile_all_states, profile_summary)
 
                 time_spent_summary <- profile_summary %>%
-                  dplyr::select(state_name, phase, ID, day, Genotype) %>%
-                  dplyr::group_by(state_name, phase, ID, day, Genotype) %>%
+                  dplyr::select(state_name, phase, ID, day) %>%
+                  dplyr::group_by(state_name, phase, ID, day) %>%
                   dplyr::summarise(time_spent = dplyr::n() * 1, .groups = "drop")
                 time_spent_all_states <- rbind(time_spent_all_states, time_spent_summary)
               } else {
@@ -395,18 +409,24 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
 
       # Ensure all state-phase combinations are present in the time spent data
       time_spent_all_states <- time_spent_all_states %>%
-        dplyr::group_by(Genotype, ID, day) %>%
+        dplyr::group_by(ID, day) %>%
         tidyr::complete(
-          # phase = unique(time_spent_all_states$phase),
-          # state_name = unique(time_spent_all_states$state_name),
           phase = c("light", "dark"),
           state_name = c("State0", "State1", "State2", "State3"),
           fill = list(time_spent = 0)
-        )
+        ) %>%
+        dplyr::ungroup()
 
-      # Remove quality control columns from final profile dataframe
-      profile_all_states <- profile_all_states %>%
-        dplyr::select(-c(n, error_score))
+      # Join metadata back to results
+      if (nrow(time_spent_all_states) > 0) {
+        time_spent_all_states <- dplyr::left_join(time_spent_all_states, meta_lookup, by = c("ID" = "id", "day")) %>%
+          dplyr::relocate(ID, day, dplyr::any_of(names(meta_lookup)))
+
+        profile_all_states <- profile_all_states %>%
+          dplyr::select(-c(n, error_score)) %>%
+          dplyr::left_join(meta_lookup, by = c("ID" = "id", "day")) %>%
+          dplyr::relocate(ID, day, dplyr::any_of(names(meta_lookup)))
+      }
 
       tictoc::toc()
 

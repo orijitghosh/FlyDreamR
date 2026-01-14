@@ -39,7 +39,8 @@ The file must contain the following columns:
 | **`stop_datetime`** | Experiment end timestamp (`YYYY-MM-DD HH:MM:SS`). | `2025-02-15 09:00:00` |
 | **`region_id`** | The channel number (1–32) on the monitor. | `1` |
 | **`genotype`** | Experimental genotype or condition identifier. | `CantonS` |
-| **`replicate`** | Replicate number (integer). Use a random number if not applicable. | `1` |
+| **`replicate`** | Replicate number (not mandatory). | `1` |
+| **`sex`** | Sex identifier (not mandatory). | `Female` |
 
 ### Example Metadata
 
