@@ -80,7 +80,3 @@ ggplot2::ggplot(trad_5min$sleep_summary_phase,
   ggplot2::facet_grid(phase ~ day, scales = "free_y") +
   ggplot2::theme_minimal()
 ```
-
-If you’d like these plots to run during vignette builds, ship a small
-example dataset inside the package (e.g., in `inst/extdata/`) and point
-`metafile_path` at `system.file(...)`.
