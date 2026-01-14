@@ -1,9 +1,9 @@
 file,start_datetime,stop_datetime,region_id,genotype,replicate
-Monitor1.txt,2024-04-11 06:00:00,2024-04-15 06:00:00,1,SGRP_043_F,Block8Rep3
-Monitor1.txt,2024-04-11 06:00:00,2024-04-15 06:00:00,2,SGRP_043_F,Block8Rep3
-Monitor1.txt,2024-04-11 06:00:00,2024-04-15 06:00:00,3,SGRP_043_F,Block8Rep3
-Monitor1.txt,2024-04-11 06:00:00,2024-04-15 06:00:00,4,SGRP_043_F,Block8Rep3
-Monitor1.txt,2024-04-11 06:00:00,2024-04-15 06:00:00,5,SGRP_043_F,Block8Rep3
-Monitor1.txt,2024-04-11 06:00:00,2024-04-15 06:00:00,6,SGRP_043_F,Block8Rep3
-Monitor1.txt,2024-04-11 06:00:00,2024-04-15 06:00:00,7,SGRP_043_F,Block8Rep3
-Monitor1.txt,2024-04-11 06:00:00,2024-04-15 06:00:00,8,SGRP_043_F,Block8Rep3
+Monitor1.txt,2017-02-18 10:00:00,2017-02-26 09:59:00,1,Control,1
+Monitor1.txt,2017-02-18 10:00:00,2017-02-26 09:59:00,2,Control,1
+Monitor1.txt,2017-02-18 10:00:00,2017-02-26 09:59:00,3,Control,1
+Monitor1.txt,2017-02-18 10:00:00,2017-02-26 09:59:00,4,Control,1
+Monitor1.txt,2017-02-18 10:00:00,2017-02-26 09:59:00,5,Control,1
+Monitor1.txt,2017-02-18 10:00:00,2017-02-26 09:59:00,6,Control,1
+Monitor1.txt,2017-02-18 10:00:00,2017-02-26 09:59:00,7,Control,1
+Monitor1.txt,2017-02-18 10:00:00,2017-02-26 09:59:00,8,Control,1
