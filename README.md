@@ -13,7 +13,7 @@
 -   **Inference:** Infer sleep states using serial or parallel processing.
 -   **Analysis:** Generate publication-ready visualizations and sleep metrics.
 
-For detailed guides and walk through, visit www.orijitghosh.github.io/FlyDreamR.
+For detailed guides and walk through, visit https://orijitghosh.github.io/FlyDreamR/.
 
 ------------------------------------------------------------------------
 
