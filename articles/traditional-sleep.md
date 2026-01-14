@@ -1,0 +1,86 @@
+# Traditional sleep analyses
+
+This vignette demonstrates FlyDreamR’s “traditional” sleep workflow
+using
+[`calcTradSleep()`](https://orijitghosh.github.io/FlyDreamR/reference/calcTradSleep.md).
+
+## Prepare data with a sleep definition
+
+FlyDreamR lets you define sleep as immobility bouts of a minimum
+duration (e.g., 5 minutes, 60 minutes). Start by preparing the dataset
+with
+[`HMMDataPrep()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMDataPrep.md)
+and a chosen `min_time_immobile` definition.
+
+``` r
+# Load demo data
+meta_file <- system.file("extdata", "Metadata_Monitor1.csv", package = "FlyDreamR")
+data_dir <- system.file("extdata", package = "FlyDreamR")
+# 5-minute sleep definition
+dt_5min <- HMMDataPrep(
+  metafile_path = meta_file,
+  result_dir    = data_dir,
+  ldcyc              = 12,
+  day_range          = c(1, 2),
+  min_time_immobile  = c(behavr::mins(5), behavr::mins(1440))
+)
+
+trad_5min <- calcTradSleep(dt_5min)
+trad_5min
+```
+
+``` r
+# 60-minute sleep definition
+dt_60min <- HMMDataPrep(
+  metafile_path = meta_file,
+  result_dir    = data_dir,
+  ldcyc              = 12,
+  day_range          = c(1, 2),
+  min_time_immobile  = c(behavr::mins(60), behavr::mins(1440))
+)
+
+trad_60min <- calcTradSleep(dt_60min)
+trad_60min
+```
+
+[`calcTradSleep()`](https://orijitghosh.github.io/FlyDreamR/reference/calcTradSleep.md)
+returns a list of summary tables, including day/night breakdowns and
+bout/latency statistics.
+
+## Plotting somnograms and sleep/activity profiles
+
+A common plotting workflow uses `ggetho` (for ethograms/profiles) and
+`ggplot2` for summary visualizations.
+
+``` r
+library(ggplot2)
+library(ggetho)
+
+# Somnogram-like ethogram
+ggetho::ggetho(dt_5min, mapping = aes(x = t, z = asleep)) +
+  ggetho::stat_bar_tile_etho()
+
+# Sleep profile by genotype
+ggetho::ggetho(dt_5min, mapping = aes(x = t, y = asleep, color = genotype)) +
+  ggetho::stat_pop_etho()
+
+# Facet by genotype + LD annotations
+ggetho::ggetho(dt_5min, mapping = aes(x = t, y = asleep, color = genotype)) +
+  ggetho::stat_pop_etho() +
+  ggplot2::facet_grid(genotype ~ .) +
+  ggetho::stat_ld_annotations()
+```
+
+## Plot summary sleep time by day/night
+
+``` r
+ggplot2::ggplot(trad_5min$sleep_summary_phase,
+                ggplot2::aes(x = genotype, y = time_spent_sleeping, fill = genotype)) +
+  ggplot2::geom_boxplot(width = 0.35, outliers = FALSE) +
+  ggplot2::facet_grid(phase ~ day, scales = "free_y") +
+  ggplot2::theme_minimal()
+```
+
+If you’d like these plots to run during vignette builds, ship a small
+example dataset inside the package (e.g., in `inst/extdata/`) and point
+`metafile_path` at `system.file(...)`.
