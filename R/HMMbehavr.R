@@ -438,8 +438,8 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
 
       # Return the results as a list of data frames
       return(list(
-        TimeSpentInEachState = time_spent_all_states,
-        VITERBIDecodedProfile = profile_all_states
+        TimeSpentInEachState = time_spent_all_states %>% dplyr::select(-c(file_info, experiment_id)),
+        VITERBIDecodedProfile = profile_all_states %>% dplyr::select(-c(file_info, experiment_id))
       ))
     },
     error = function(e) {
