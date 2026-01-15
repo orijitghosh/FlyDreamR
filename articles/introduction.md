@@ -26,17 +26,15 @@ vignettes included with the package.
 
 ## Installation (typical options)
 
-If you have a source tarball (e.g., `FlyDreamR_1.0.0.tar.gz`), you can
-install from source:
+From GitHub (recommended)
 
 ``` r
-install.packages(c("devtools", "ggplot2", "ggetho", "magrittr", "patchwork"))
+# Install from GitHub (devtools or remotes)
+install.packages(c('devtools','remotes'), repos='https://cloud.r-project.org')
+remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
 
-d <- tempdir()
-untar("FlyDreamR_1.0.0.tar.gz", compressed = "gzip", exdir = d)
-devtools::install(file.path(d, "FlyDreamR"),
-                  dependencies = TRUE,
-                  repos = "https://cloud.r-project.org/")
+# Pin to a specific release
+remotes::install_github('orijitghosh/FlyDreamR@v1.0.0', upgrade = 'never')
 ```
 
 Then load the package:
