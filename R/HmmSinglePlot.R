@@ -130,12 +130,12 @@ HMMSinglePlot <- function(HMMinferList, col_palette = "default") {
       )
       p1 <- ggplot() +
         geom_line(probs_plot,
-          mapping = aes(x = (timestamp / 60), y = as.numeric(State) / 3),
-          color = "black", size = 0.5, alpha = 0.1
+                  mapping = aes(x = (timestamp / 60), y = as.numeric(State) / 3),
+                  color = "black", size = 0.5, alpha = 0.1
         ) +
         geom_point(probs_plot,
-          mapping = aes(x = (timestamp / 60), y = as.numeric(State) / 3, color = state_name),
-          size = 4, alpha = 1, stroke = 0.5, shape = 124
+                   mapping = aes(x = (timestamp / 60), y = as.numeric(State) / 3, color = state_name),
+                   size = 4, alpha = 1, stroke = 0.5, shape = 124
         ) +
         guides(color = guide_legend(
           override.aes = list(shape = 18, alpha = 1), title = "State name"
