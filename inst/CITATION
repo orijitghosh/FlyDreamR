@@ -9,6 +9,6 @@ bibentry(
   doi      = "10.64898/2026.01.14.699526",
   publisher = "Cold Spring Harbor Laboratory",
   note     = "R package version 1.0.0",
-  journal  = "bioRxiv"
+  journal  = "bioRxiv",
   url      = "https://www.biorxiv.org/content/early/2026/01/14/2026.01.14.699526"
 )
