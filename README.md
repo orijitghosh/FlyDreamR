@@ -60,7 +60,7 @@ To link your raw monitor files with experimental conditions, you must create a *
 | **`region_id`** | The specific channel number (1–32) on the DAM monitor for this fly. | `1` |
 | **`genotype`** | The experimental genotype identifier or treatment group. | `CantonS` |
 | **`replicate`** | The replicate identifier. (Note: If you do not have replicates, that does not affect calculations). | `1` |
-| **`sex`** | The sex identifier. (Note: If you do not different sexes, that does not affect calculations). | `Female` |
+| **`sex`** | The sex identifier. (Note: If you do not have different sexes, that does not affect calculations). | `Female` |
 
 ------------------------------------------------------------------------
 
