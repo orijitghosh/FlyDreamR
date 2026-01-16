@@ -95,7 +95,7 @@ To link your raw monitor files with experimental conditions, you must create a *
 If you use FlyDreamR in your research, please cite:
 
 ```         
-Ghosh, A. & Harbison, S.T. (2026). Inferring the genetic basis of sleep states in Drosophila melanogaster using Hidden Markov models. GitHub repository.
+Ghosh A, Harbison ST. Inferring the genetic basis of sleep states in Drosophila melanogaster using hidden Markov models. bioRxiv. 2026: 2026.2001.2014.699526.
 ```
 
 ------------------------------------------------------------------------
