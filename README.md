@@ -41,22 +41,6 @@ remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
 # Pin to a specific release
 remotes::install_github('orijitghosh/FlyDreamR@v1.0.0', upgrade = 'never')
 ```
-
-### From source (local installation)
-
-``` r
-# Install additional packages for initial installation and post processing
-install.packages(c("devtools", "ggplot2", "ggetho", "magrittr", "patchwork"))
-
-# Create a temporary directory and extract the package source code
-d <- tempdir()
-untar("FlyDreamR_1.0.0.tar.gz", compressed="gzip", exdir=d)
-
-# Build the package from source
-devtools::install(file.path(d, "FlyDreamR"), dependencies=TRUE, 
-                  repos="https://cloud.r-project.org/")
-```
-
 ------------------------------------------------------------------------
 
 ### 📝 Data Preparation: Metadata File
