@@ -58,9 +58,6 @@ For detailed guides and walk through, visit
 # Install from GitHub (devtools or remotes)
 install.packages(c('devtools','remotes'), repos='https://cloud.r-project.org')
 remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
-
-# Pin to a specific release
-remotes::install_github('orijitghosh/FlyDreamR@v1.0.0', upgrade = 'never')
 ```
 
 ------------------------------------------------------------------------
