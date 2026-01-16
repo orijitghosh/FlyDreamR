@@ -48,8 +48,6 @@ library(FlyDreamR)
 - Check documentation:
   [`?HMMbehavr`](https://orijitghosh.github.io/FlyDreamR/reference/HMMbehavr.md)
 - View examples: `example(HMMplot)`
-- Report issues / request features: add your preferred tracker link in
-  `DESCRIPTION` (e.g., `URL` / `BugReports`)
 
 ## Citation
 
