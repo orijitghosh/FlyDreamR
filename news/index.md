@@ -13,6 +13,8 @@
   [`HMMplot()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMplot.md),
   [`HMMFacetedPlot()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMFacetedPlot.md),
   [`HMMSinglePlot()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMSinglePlot.md)
+- The `FlyDreamR` preprint is now
+  [online](https://www.biorxiv.org/content/10.64898/2026.01.14.699526v1-0)
 
 ### Bug Fixes
 
