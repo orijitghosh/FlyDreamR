@@ -10,14 +10,19 @@
 Source:
 [`inst/CITATION`](https://github.com/orijitghosh/FlyDreamR/blob/HEAD/inst/CITATION)
 
-Ghosh A, Harbison S (2026). *Inferring the genetic basis of sleep states
-in Drosophila melanogaster using Hidden Markov models*. R package
-version 1.0.0, <https://github.com/orijitghosh/FlyDreamR>.
+Ghosh A, Harbison S (2026). “Inferring the genetic basis of sleep states
+in Drosophila melanogaster using hidden Markov models.” *bioRxiv*.
+[doi:10.64898/2026.01.14.699526](https://doi.org/10.64898/2026.01.14.699526),
+R package version 1.0.0,
+<https://www.biorxiv.org/content/early/2026/01/14/2026.01.14.699526>.
 
-    @Manual{,
-      title = {Inferring the genetic basis of sleep states in Drosophila melanogaster using Hidden Markov models},
+    @Article{,
+      title = {Inferring the genetic basis of sleep states in Drosophila melanogaster using hidden Markov models},
       author = {Arijit Ghosh and Susan T. Harbison},
       year = {2026},
+      doi = {10.64898/2026.01.14.699526},
+      publisher = {Cold Spring Harbor Laboratory},
       note = {R package version 1.0.0},
-      url = {https://github.com/orijitghosh/FlyDreamR},
+      journal = {bioRxiv},
+      url = {https://www.biorxiv.org/content/early/2026/01/14/2026.01.14.699526},
     }
