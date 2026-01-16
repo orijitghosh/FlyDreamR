@@ -6,6 +6,7 @@
 -   Implemented comprehensive traditional sleep analysis with `calcTradSleep()`
 -   Created interactive Shiny app for GUI-based analysis
 -   Added multiple visualization functions: `HMMplot()`, `HMMFacetedPlot()`, `HMMSinglePlot()`
+-   The `FlyDreamR` preprint is now [online](https://www.biorxiv.org/content/10.64898/2026.01.14.699526v1-0)
 
 ## Bug Fixes
 
