@@ -63,21 +63,6 @@ remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
 remotes::install_github('orijitghosh/FlyDreamR@v1.0.0', upgrade = 'never')
 ```
 
-### From source (local installation)
-
-``` r
-# Install additional packages for initial installation and post processing
-install.packages(c("devtools", "ggplot2", "ggetho", "magrittr", "patchwork"))
-
-# Create a temporary directory and extract the package source code
-d <- tempdir()
-untar("FlyDreamR_1.0.0.tar.gz", compressed="gzip", exdir=d)
-
-# Build the package from source
-devtools::install(file.path(d, "FlyDreamR"), dependencies=TRUE, 
-                  repos="https://cloud.r-project.org/")
-```
-
 ------------------------------------------------------------------------
 
 ### 📝 Data Preparation: Metadata File
@@ -92,15 +77,15 @@ timing.
 
 #### Required Columns
 
-| Column Header        | Description                                                                                         | Example               |
-|:---------------------|:----------------------------------------------------------------------------------------------------|:----------------------|
-| **`file`**           | The full filename of the raw DAM monitor file, including the extension.                             | `Monitor1.txt`        |
-| **`start_datetime`** | The exact date and time the experiment started (Format: `YYYY-MM-DD HH:MM:SS`).                     | `2025-02-12 06:04:00` |
-| **`stop_datetime`**  | The exact date and time the experiment ended.                                                       | `2025-02-15 09:00:00` |
-| **`region_id`**      | The specific channel number (1–32) on the DAM monitor for this fly.                                 | `1`                   |
-| **`genotype`**       | The experimental genotype identifier or treatment group.                                            | `CantonS`             |
-| **`replicate`**      | The replicate identifier. (Note: If you do not have replicates, that does not affect calculations). | `1`                   |
-| **`sex`**            | The sex identifier. (Note: If you do not different sexes, that does not affect calculations).       | `Female`              |
+| Column Header | Description | Example |
+|:---|:---|:---|
+| **`file`** | The full filename of the raw DAM monitor file, including the extension. | `Monitor1.txt` |
+| **`start_datetime`** | The exact date and time the experiment started (Format: `YYYY-MM-DD HH:MM:SS`). | `2025-02-12 06:04:00` |
+| **`stop_datetime`** | The exact date and time the experiment ended. | `2025-02-15 09:00:00` |
+| **`region_id`** | The specific channel number (1–32) on the DAM monitor for this fly. | `1` |
+| **`genotype`** | The experimental genotype identifier or treatment group. | `CantonS` |
+| **`replicate`** | The replicate identifier. (Note: If you do not have replicates, that does not affect calculations). | `1` |
+| **`sex`** | The sex identifier. (Note: If you do not different sexes, that does not affect calculations). | `Female` |
 
 ------------------------------------------------------------------------
 
