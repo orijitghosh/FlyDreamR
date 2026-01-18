@@ -5,11 +5,6 @@ cran_pkgs <- c(
   "damr","sleepr","behavr","dplyr","depmixS4","progress","slider","reshape2"
 )
 
-# If you have non-CRAN packages, put them here as "pkg" = "owner/repo"
-github_pkgs <- c(
-  # "FlyDreamR" = "orijitghosh/FlyDreamR"   # <-- fill in the correct repo if this is on GitHub
-)
-
 ensure_installed <- function() {
   # use a stable CRAN mirror or Posit Package Manager if your org has one
   if (is.na(getOption("repos")["CRAN"]) || getOption("repos")["CRAN"] == "@CRAN@") {
@@ -17,14 +12,14 @@ ensure_installed <- function() {
   }
   missing_cran <- setdiff(cran_pkgs, rownames(installed.packages()))
   if (length(missing_cran)) install.packages(missing_cran)
-  
+
   if (length(github_pkgs)) {
     if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
     for (pkg in names(github_pkgs)) {
       if (!requireNamespace(pkg, quietly = TRUE)) remotes::install_github(github_pkgs[[pkg]])
     }
   }
-  
+
   # load everything (quietly)
   suppressPackageStartupMessages(
     lapply(c(cran_pkgs, names(github_pkgs)), require, character.only = TRUE)
@@ -69,7 +64,7 @@ navbarPage(
         "body { background-color: $body-bg; }"
       )
     ),
-  
+
   # ===================================================================
   # 1. DATA INPUT TAB
   # ===================================================================
@@ -158,7 +153,7 @@ navbarPage(
       ) # end mainPanel
     ) # end sidebarLayout
   ), # end tabPanel "Data Input"
-  
+
   # ===================================================================
   # 2. SLEEP PROFILES TAB
   # ===================================================================
@@ -242,7 +237,7 @@ navbarPage(
       ) # end tabPanel "Download data"
     ) # end navlistPanel
   ), # end tabPanel "Sleep Profiles"
-  
+
   # ===================================================================
   # FOOTER
   # ===================================================================

@@ -1,3 +1,5 @@
+# From Dean Attali
+
 withBusyIndicatorCSS <- "
 .btn-loading-container {
 margin-left: 10px;

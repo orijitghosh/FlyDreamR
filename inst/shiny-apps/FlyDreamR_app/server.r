@@ -5,13 +5,7 @@ cran_pkgs <- c(
   "damr","sleepr","behavr","dplyr","depmixS4","progress","slider","reshape2"
 )
 
-# If you have non-CRAN packages, put them here as "pkg" = "owner/repo"
-github_pkgs <- c(
-  # "FlyDreamR" = "orijitghosh/FlyDreamR"   # <-- fill in the correct repo if this is on GitHub
-)
-
 ensure_installed <- function() {
-  # use a stable CRAN mirror or Posit Package Manager if your org has one
   if (is.na(getOption("repos")["CRAN"]) || getOption("repos")["CRAN"] == "@CRAN@") {
     options(repos = c(CRAN = "https://cloud.r-project.org"))
   }
