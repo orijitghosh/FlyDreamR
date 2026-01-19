@@ -10,7 +10,7 @@ HMMSinglePlot(HMMinferList, col_palette = "default")
 \item{HMMinferList}{A list, typically the output from \code{\link{HMMbehavr}}.
 The second element (\code{HMMinferList[[2]]}) must be a data frame with
 the \code{VITERBIDecodedProfile} containing: \code{ID}, \code{day},
-\code{timestamp}, \code{state_name}, and \code{Genotype}.}
+\code{timestamp}, \code{state_name}, and \code{genotype}.}
 
 \item{col_palette}{Character string specifying the color palette. Options:
 \describe{

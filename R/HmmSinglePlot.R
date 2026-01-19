@@ -13,7 +13,7 @@
 #' @param HMMinferList A list, typically the output from \code{\link{HMMbehavr}}.
 #'   The second element (\code{HMMinferList[[2]]}) must be a data frame with
 #'   the \code{VITERBIDecodedProfile} containing: \code{ID}, \code{day},
-#'   \code{timestamp}, \code{state_name}, and \code{Genotype}.
+#'   \code{timestamp}, \code{state_name}, and \code{genotype}.
 #' @param col_palette Character string specifying the color palette. Options:
 #'   \describe{
 #'     \item{\code{"default"}}{Standard FlyDreamR colors}
@@ -172,12 +172,12 @@ HMMSinglePlot <- function(HMMinferList, col_palette = "default") {
           axis.text.y = element_text(margin = margin(t = 0, r = -20, b = 0, l = 0))
         )
       # p
-      p1 <- p1 + ggtitle(paste0("Day:", j), subtitle = paste0("Genotype:", unique(df_loop$Genotype), " - ", i))
+      p1 <- p1 + ggtitle(paste0("Day:", j), subtitle = paste0("Genotype:", unique(df_loop$genotype), " - ", i))
       p <- p1 +
         coord_cartesian(xlim = c(0, 24), ylim = c(0, 1), clip = "off") +
         annotate("segment", x = 0.0, xend = 24.01, y = -0.25, yend = -0.25, size = 4, color = "black") +
         annotate("segment", x = 0.0 + 0.01, xend = 24.01 - 12.01, y = -0.25, yend = -0.25, size = 3, color = "white")
-      loop_filename <- paste0("./profiles_all/", unique(df_loop$Genotype), "/", loopid, "_day", loopday, "_4states.png")
+      loop_filename <- paste0("./profiles_all/", unique(df_loop$genotype), "/", loopid, "_day", loopday, "_4states.png")
       loop_filename <- gsub(":", "_", loop_filename)
       pattern_to_remove <- "\\d{4}-\\d{2}-\\d{2} \\d{2}_\\d{2}_\\d{2}\\|.*\\.txt\\|"
       loop_filename <- sub(pattern_to_remove, "", loop_filename)
