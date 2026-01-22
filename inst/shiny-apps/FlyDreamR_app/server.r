@@ -12,13 +12,6 @@ ensure_installed <- function() {
   missing_cran <- setdiff(cran_pkgs, rownames(installed.packages()))
   if (length(missing_cran)) install.packages(missing_cran)
 
-  if (length(github_pkgs)) {
-    if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
-    for (pkg in names(github_pkgs)) {
-      if (!requireNamespace(pkg, quietly = TRUE)) remotes::install_github(github_pkgs[[pkg]])
-    }
-  }
-
   # load everything (quietly)
   suppressPackageStartupMessages(
     lapply(c(cran_pkgs, names(github_pkgs)), require, character.only = TRUE)
