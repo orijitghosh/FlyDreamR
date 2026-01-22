@@ -15,7 +15,7 @@ ensure_installed <- function() {
 
   # load everything (quietly)
   suppressPackageStartupMessages(
-    lapply(c(cran_pkgs, names(github_pkgs)), require, character.only = TRUE)
+    lapply(c(cran_pkgs), require, character.only = TRUE)
   )
 }
 
