@@ -13,7 +13,7 @@
 -   **Inference:** Infer sleep states using serial or parallel processing.
 -   **Analysis:** Generate publication-ready visualizations and sleep metrics.
 
-For detailed guides and walk through, visit https://orijitghosh.github.io/FlyDreamR/.
+For detailed guides and walk through, visit <https://orijitghosh.github.io/FlyDreamR/>.
 
 ------------------------------------------------------------------------
 
@@ -38,6 +38,7 @@ For detailed guides and walk through, visit https://orijitghosh.github.io/FlyDre
 install.packages(c('devtools','remotes'), repos='https://cloud.r-project.org')
 remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
 ```
+
 ------------------------------------------------------------------------
 
 ### 📝 Data Preparation: Metadata File
@@ -49,25 +50,31 @@ To link your raw monitor files with experimental conditions, you must create a *
 
 #### Required Columns
 
-| Column Header | Description | Example |
-|:-----------------------|:-----------------------|:-----------------------|
-| **`file`** | The full filename of the raw DAM monitor file, including the extension. | `Monitor1.txt` |
-| **`start_datetime`** | The exact date and time the experiment started (Format: `YYYY-MM-DD HH:MM:SS`). | `2025-02-12 06:04:00` |
-| **`stop_datetime`** | The exact date and time the experiment ended. | `2025-02-15 09:00:00` |
-| **`region_id`** | The specific channel number (1–32) on the DAM monitor for this fly. | `1` |
-| **`genotype`** | The experimental genotype identifier or treatment group. | `CantonS` |
-| **`replicate`** | The replicate identifier. (Note: If you do not have replicates, that does not affect calculations). | `1` |
-| **`sex`** | The sex identifier. (Note: If you do not have different sexes, that does not affect calculations). | `Female` |
+| Column Header        | Description                                                                                         | Example               |
+|:---------------------|:----------------------------------------------------------------------------------------------------|:----------------------|
+| **`file`**           | The full filename of the raw DAM monitor file, including the extension.                             | `Monitor1.txt`        |
+| **`start_datetime`** | The exact date and time the experiment started (Format: `YYYY-MM-DD HH:MM:SS`).                     | `2025-02-12 06:04:00` |
+| **`stop_datetime`**  | The exact date and time the experiment ended.                                                       | `2025-02-15 09:00:00` |
+| **`region_id`**      | The specific channel number (1–32) on the DAM monitor for this fly.                                 | `1`                   |
+| **`genotype`**       | The experimental genotype identifier or treatment group.                                            | `CantonS`             |
+| **`replicate`**      | The replicate identifier. (Note: If you do not have replicates, that does not affect calculations). | `1`                   |
+| **`sex`**            | The sex identifier. (Note: If you do not have different sexes, that does not affect calculations).  | `Female`              |
 
 ------------------------------------------------------------------------
 
 ## 💡 Common Issues
 
--   **Problem: HMM fitting is slow** **Solution:** Use `HMMbehavrFast()` with `n_cores` set to your CPU core count minus 1 to enable parallel processing.
+-   **Problem: HMM fitting is slow**
 
--   **Problem: Plots look different from the tutorial** **Solution:** Ensure you have the latest versions of `ggplot2` and `patchwork` installed, as layout logic can vary between versions.
+    **Solution:** Use `HMMbehavrFast()` with `n_cores` set to your CPU core count minus 1 to enable parallel processing.
 
--   **Problem: Heatmap hypnograms show greyed out days** **Solution:** This indicates the HMM did not find a suitable solution for those days. Rerun the analysis with a higher number of iterations.
+-   **Problem: Plots look different from the tutorial**
+
+    **Solution:** Ensure you have the latest versions of `ggplot2` and `patchwork` installed, as layout logic can vary between versions.
+
+-   **Problem: Heatmap hypnograms show greyed out days**
+
+    **Solution:** This indicates the HMM did not find a suitable solution for those days. Rerun the analysis with a higher number of iterations. If many days are greyed out, check if the fly died during experiment.
 
 ------------------------------------------------------------------------
 
