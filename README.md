@@ -48,10 +48,10 @@ To link your raw monitor files with experimental conditions, you must create a *
 -   **Format:** `.csv` (Comma Separated Values)
 -   **Rows:** One row per fly (channel).
 
-#### Required Columns
+#### Columns (first five are required)
 
 | Column Header        | Description                                                                                         | Example               |
-|:---------------------|:----------------------------------------------------------------------------------------------------|:----------------------|
+|:---------------|:----------------------------------------|:---------------|
 | **`file`**           | The full filename of the raw DAM monitor file, including the extension.                             | `Monitor1.txt`        |
 | **`start_datetime`** | The exact date and time the experiment started (Format: `YYYY-MM-DD HH:MM:SS`).                     | `2025-02-12 06:04:00` |
 | **`stop_datetime`**  | The exact date and time the experiment ended.                                                       | `2025-02-15 09:00:00` |
