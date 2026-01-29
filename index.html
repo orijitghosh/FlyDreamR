@@ -8,8 +8,8 @@
 <title>Infer Sleep/Wake States from activity data using hidden Markov models (HMMs) • FlyDreamR</title>
 <script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
-<link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Infer Sleep/Wake States from activity data using hidden Markov models (HMMs)">
 <meta name="description" content="Implements an iterative hidden Markov model for inferring sleep and wake states from activity-count data, plus tools for data preparation, visualization, and summary metrics.">
 <meta property="og:description" content="Implements an iterative hidden Markov model for inferring sleep and wake states from activity-count data, plus tools for data preparation, visualization, and summary metrics.">
@@ -116,7 +116,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install from GitHub (devtools or remotes)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'devtools'</span>,<span class="st">'remotes'</span><span class="op">)</span>, repos<span class="op">=</span><span class="st">'https://cloud.r-project.org'</span><span class="op">)</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'orijitghosh/FlyDreamR'</span>, upgrade <span class="op">=</span> <span class="st">'never'</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/remotes/man/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'orijitghosh/FlyDreamR'</span>, upgrade <span class="op">=</span> <span class="st">'never'</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level3">
@@ -130,13 +130,13 @@
 <strong>Rows:</strong> One row per fly (channel).</li>
 </ul>
 <div class="section level4">
-<h4 id="required-columns">Required Columns<a class="anchor" aria-label="anchor" href="#required-columns"></a>
+<h4 id="columns-first-five-are-required">Columns (first five are required)<a class="anchor" aria-label="anchor" href="#columns-first-five-are-required"></a>
 </h4>
 <table class="table">
 <colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
+<col width="21%">
+<col width="56%">
+<col width="21%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Column Header</th>
@@ -189,9 +189,18 @@
 <h2 id="id_-common-issues">💡 Common Issues<a class="anchor" aria-label="anchor" href="#id_-common-issues"></a>
 </h2>
 <ul>
-<li><p><strong>Problem: HMM fitting is slow</strong> <strong>Solution:</strong> Use <code><a href="reference/HMMbehavrFast.html">HMMbehavrFast()</a></code> with <code>n_cores</code> set to your CPU core count minus 1 to enable parallel processing.</p></li>
-<li><p><strong>Problem: Plots look different from the tutorial</strong> <strong>Solution:</strong> Ensure you have the latest versions of <code>ggplot2</code> and <code>patchwork</code> installed, as layout logic can vary between versions.</p></li>
-<li><p><strong>Problem: Heatmap hypnograms show greyed out days</strong> <strong>Solution:</strong> This indicates the HMM did not find a suitable solution for those days. Rerun the analysis with a higher number of iterations.</p></li>
+<li>
+<p><strong>Problem: HMM fitting is slow</strong></p>
+<p><strong>Solution:</strong> Use <code><a href="reference/HMMbehavrFast.html">HMMbehavrFast()</a></code> with <code>n_cores</code> set to your CPU core count minus 1 to enable parallel processing.</p>
+</li>
+<li>
+<p><strong>Problem: Plots look different from the tutorial</strong></p>
+<p><strong>Solution:</strong> Ensure you have the latest versions of <code>ggplot2</code> and <code>patchwork</code> installed, as layout logic can vary between versions.</p>
+</li>
+<li>
+<p><strong>Problem: Heatmap hypnograms show greyed out days</strong></p>
+<p><strong>Solution:</strong> This indicates the HMM did not find a suitable solution for those days. Rerun the analysis with a higher number of iterations. If many days are greyed out, check if the fly died during experiment.</p>
+</li>
 </ul>
 <hr>
 </div>

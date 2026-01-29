@@ -26,7 +26,7 @@ HMMSinglePlot(HMMinferList, col_palette = "default")
   [`HMMbehavr`](https://orijitghosh.github.io/FlyDreamR/reference/HMMbehavr.md).
   The second element (`HMMinferList[[2]]`) must be a data frame with the
   `VITERBIDecodedProfile` containing: `ID`, `day`, `timestamp`,
-  `state_name`, and `Genotype`.
+  `state_name`, and `genotype`.
 
 - col_palette:
 
