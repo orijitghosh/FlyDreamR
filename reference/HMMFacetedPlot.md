@@ -68,7 +68,8 @@ A `ggplot2` object displaying a faceted plot with:
   indicating light phase
 
 The plot can be further customized using standard `ggplot2` functions or
-saved using [`ggsave()`](https://rdrr.io/pkg/ggplot2/man/ggsave.html).
+saved using
+[`ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html).
 
 ## Details
 

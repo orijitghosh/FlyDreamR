@@ -21,15 +21,15 @@ exact start and stop times for the experiment.
 
 The file must contain the following columns:
 
-| Column Header        | Description                                                      | Example               |
-|:---------------------|:-----------------------------------------------------------------|:----------------------|
-| **`file`**           | The full filename of the DAM monitor file (including extension). | `Monitor1.txt`        |
-| **`start_datetime`** | Experiment start timestamp (`YYYY-MM-DD HH:MM:SS`).              | `2025-02-12 06:04:00` |
-| **`stop_datetime`**  | Experiment end timestamp (`YYYY-MM-DD HH:MM:SS`).                | `2025-02-15 09:00:00` |
-| **`region_id`**      | The channel number (1–32) on the monitor.                        | `1`                   |
-| **`genotype`**       | Experimental genotype or condition identifier.                   | `CantonS`             |
-| **`replicate`**      | Replicate number (not mandatory).                                | `1`                   |
-| **`sex`**            | Sex identifier (not mandatory).                                  | `Female`              |
+| Column Header | Description | Example |
+|:---|:---|:---|
+| **`file`** | The full filename of the DAM monitor file (including extension). | `Monitor1.txt` |
+| **`start_datetime`** | Experiment start timestamp (`YYYY-MM-DD HH:MM:SS`). | `2025-02-12 06:04:00` |
+| **`stop_datetime`** | Experiment end timestamp (`YYYY-MM-DD HH:MM:SS`). | `2025-02-15 09:00:00` |
+| **`region_id`** | The channel number (1–32) on the monitor. | `1` |
+| **`genotype`** | Experimental genotype or condition identifier. | `CantonS` |
+| **`replicate`** | Replicate number (not mandatory). | `1` |
+| **`sex`** | Sex identifier (not mandatory). | `Female` |
 
 ### Example Metadata
 
