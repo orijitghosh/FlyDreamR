@@ -95,6 +95,12 @@ timing.
   with `n_cores` set to your CPU core count minus 1 to enable parallel
   processing.
 
+- **Problem: HMM fitting is taking longer than 15 minutes**
+
+  **Solution:** If you are already using `HmmbehavrFast()` with multiple
+  cores, most probably you have dead flies in your data, and the
+  algorithm gets stuck there.
+
 - **Problem: Plots look different from the tutorial**
 
   **Solution:** Ensure you have the latest versions of `ggplot2` and
@@ -112,7 +118,7 @@ timing.
 
 If you use FlyDreamR in your research, please cite:
 
-    Ghosh A, Harbison ST. Inferring the genetic basis of sleep states in Drosophila melanogaster using hidden Markov models. bioRxiv. 2026: 2026.2001.2014.699526.
+    Ghosh, Arijit, and Susan T. Harbison. "Inferring the genetic basis of sleep states in Drosophila melanogaster using hidden Markov models." bioRxiv (2026): 2026-01.
 
 ------------------------------------------------------------------------
 
