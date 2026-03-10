@@ -50,15 +50,15 @@ To link your raw monitor files with experimental conditions, you must create a *
 
 #### Columns (first five are required)
 
-| Column Header        | Description                                                                                         | Example               |
-|:---------------|:----------------------------------------|:---------------|
-| **`file`**           | The full filename of the raw DAM monitor file, including the extension.                             | `Monitor1.txt`        |
-| **`start_datetime`** | The exact date and time the experiment started (Format: `YYYY-MM-DD HH:MM:SS`).                     | `2025-02-12 06:04:00` |
-| **`stop_datetime`**  | The exact date and time the experiment ended.                                                       | `2025-02-15 09:00:00` |
-| **`region_id`**      | The specific channel number (1–32) on the DAM monitor for this fly.                                 | `1`                   |
-| **`genotype`**       | The experimental genotype identifier or treatment group.                                            | `CantonS`             |
-| **`replicate`**      | The replicate identifier. (Note: If you do not have replicates, that does not affect calculations). | `1`                   |
-| **`sex`**            | The sex identifier. (Note: If you do not have different sexes, that does not affect calculations).  | `Female`              |
+| Column Header | Description | Example |
+|:---|:---|:---|
+| **`file`** | The full filename of the raw DAM monitor file, including the extension. | `Monitor1.txt` |
+| **`start_datetime`** | The exact date and time the experiment started (Format: `YYYY-MM-DD HH:MM:SS`). | `2025-02-12 06:04:00` |
+| **`stop_datetime`** | The exact date and time the experiment ended. | `2025-02-15 09:00:00` |
+| **`region_id`** | The specific channel number (1–32) on the DAM monitor for this fly. | `1` |
+| **`genotype`** | The experimental genotype identifier or treatment group. | `CantonS` |
+| **`replicate`** | The replicate identifier. (Note: If you do not have replicates, that does not affect calculations). | `1` |
+| **`sex`** | The sex identifier. (Note: If you do not have different sexes, that does not affect calculations). | `Female` |
 
 ------------------------------------------------------------------------
 
@@ -67,6 +67,10 @@ To link your raw monitor files with experimental conditions, you must create a *
 -   **Problem: HMM fitting is slow**
 
     **Solution:** Use `HMMbehavrFast()` with `n_cores` set to your CPU core count minus 1 to enable parallel processing.
+
+-   **Problem: HMM fitting is taking longer than 15 minutes**
+
+    **Solution:** If you are already using `HmmbehavrFast()` with multiple cores, most probably you have dead flies in your data, and the algorithm gets stuck there.
 
 -   **Problem: Plots look different from the tutorial**
 
@@ -83,7 +87,7 @@ To link your raw monitor files with experimental conditions, you must create a *
 If you use FlyDreamR in your research, please cite:
 
 ```         
-Ghosh A, Harbison ST. Inferring the genetic basis of sleep states in Drosophila melanogaster using hidden Markov models. bioRxiv. 2026: 2026.2001.2014.699526.
+Ghosh, Arijit, and Susan T. Harbison. "Inferring the genetic basis of sleep states in Drosophila melanogaster using hidden Markov models." bioRxiv (2026): 2026-01.
 ```
 
 ------------------------------------------------------------------------
