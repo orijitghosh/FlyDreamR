@@ -284,11 +284,10 @@ convMasterToMeta <- function(metafile,
         dplyr::arrange(DateTime) %>%
         dplyr::mutate(
           Light_Sensor_Status_num = as.numeric(Light_Sensor_Status),
-          # **FIXED**: Added dplyr::first() to resolve namespace error
           change = Light_Sensor_Status_num - dplyr::lag(Light_Sensor_Status_num, default = dplyr::first(Light_Sensor_Status_num))
         )
 
-      # --- LIGHTS-ON DETECTION LOGIC (Existing) ---
+      # --- LIGHTS-ON DETECTION LOGIC ---
       # Determine the target date from the user-provided startDT parameter
       target_start_date <- as.Date(startDT)
 
