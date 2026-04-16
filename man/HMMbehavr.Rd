@@ -69,7 +69,7 @@ inferred state at each time point selected as the final classification.
 \details{
 \subsection{State Interpretation}{
 
-States are ordered by median activity level:
+States are ordered by mean activity level:
 \itemize{
 \item \strong{State0}: Highest activity (active wake)
 \item \strong{State1}: Moderate activity (quiet wake)
