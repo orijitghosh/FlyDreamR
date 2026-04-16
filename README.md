@@ -29,7 +29,7 @@ For detailed guides and walkthroughs, visit <https://orijitghosh.github.io/FlyDr
 ## Installation
 
 ``` r
-install.packages(c('devtools', 'remotes'), repos = 'https://cloud.r-project.org')
+install.packages('remotes'), repos = 'https://cloud.r-project.org')
 remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
 ```
 
