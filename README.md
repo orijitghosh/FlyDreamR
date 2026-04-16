@@ -2,110 +2,89 @@
 
 <img src="vignettes/FlyDreamR_logo.png" alt="FlyDreamR logo" width="200" align="right"/>
 
-> **Infer Sleep/Wake States from locomotor activity data using hidden Markov models (HMMs).**
+> **Infer sleep/wake states from locomotor activity data using hidden Markov models (HMMs).**
 
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html) [![License: GPL-3](https://img.shields.io/badge/License-GPL--3-blue.svg)](LICENSE) [![Repo status](https://img.shields.io/badge/status-active-success)](#) [![Issues](https://img.shields.io/github/issues/orijitghosh/FlyDreamR.svg)](https://github.com/orijitghosh/FlyDreamR/issues)
 
-**FlyDreamR** implements an iterative **hidden Markov model (HMM)** framework to infer *sleep* and *wake* states from *Drosophila* Activity Monitor (DAM) **activity counts**. It streamlines the entire analysis pipeline:
+**FlyDreamR** fits an iterative 4-state hidden Markov model to *Drosophila* Activity Monitor (DAM) activity counts to classify each minute of recording as sleep or wake. It covers the full pipeline: loading raw monitor files, linking them to metadata, running the HMM (serially or in parallel), and producing summary plots and metrics.
 
--   **Data Loading:** Import raw DAM monitor files and link them with experimental metadata.
--   **Pre-processing:** Clean data and engineer features for HMM analysis.
--   **Inference:** Infer sleep states using serial or parallel processing.
--   **Analysis:** Generate publication-ready visualizations and sleep metrics.
-
-For detailed guides and walk through, visit <https://orijitghosh.github.io/FlyDreamR/>.
+For detailed guides and walkthroughs, visit <https://orijitghosh.github.io/FlyDreamR/>.
 
 ------------------------------------------------------------------------
 
-## ✨ Highlights
+## What it does
 
--   **End-to-end pipeline**: from metadata to publication-ready figures.
--   **Dual analysis modes**: Traditional sleep metrics AND advanced HMM-based state inference.
--   **Traditional sleep metrics** (`calcTradSleep()`): Define sleep as you wish, for 5 minutes to 60 minutes of immobility, bout counts/lengths, activity index, brief awakenings, day/phase summaries.
--   **Robust inference** with a configurable HMM and decoding.
--   **Parallel execution** via `HMMbehavrFast()` for big data.
--   **Rich visualization suite**: Heatmap hypnograms, faceted profiles, and individual profiles, per day.
--   **Interactive Shiny GUI** for users who prefer point-and-click analysis.
+**Data preparation** (`HMMDataPrep()`): the first step in the pipeline. Reads raw DAM monitor files, links them to your metadata, and returns a `behavr` table with day, light/dark phase, and normalized activity calculated and ready for HMM fitting.
+
+**Traditional sleep analysis** (`calcTradSleep()`): define sleep as immobility of 5–60 minutes; returns bout counts, bout lengths, activity index, brief awakenings, and day/phase summaries.
+
+**HMM-based state inference**: fits a per-fly, per-day HMM with configurable emission distributions and Viterbi decoding. Use `HMMbehavr()` for serial fitting or `HMMbehavrFast()` for parallel fitting across CPU cores.
+
+**Visualization**: heatmap hypnograms (`HMMplot()`), faceted group profiles (`HMMFacetedPlot()`), and single-fly daily profiles (`HMMSinglePlot()`).
+
+**Shiny GUI**: a point-and-click interface for users who prefer not to work in R directly.
 
 ------------------------------------------------------------------------
 
-## 📦 Installation
-
-### From GitHub (recommended)
+## Installation
 
 ``` r
-# Install from GitHub (devtools or remotes)
-install.packages(c('devtools','remotes'), repos='https://cloud.r-project.org')
+install.packages(c('devtools', 'remotes'), repos = 'https://cloud.r-project.org')
 remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
 ```
 
 ------------------------------------------------------------------------
 
-### 📝 Data Preparation: Metadata File
+## Data preparation: metadata file
 
-To link your raw monitor files with experimental conditions, you must create a **Metadata CSV file**. This file maps each specific monitor file and channel to the corresponding fly's genotype and experiment timing.
+You need a CSV file that maps each monitor channel to a fly's experimental conditions. One row per fly.
 
--   **Format:** `.csv` (Comma Separated Values)
--   **Rows:** One row per fly (channel).
+| Column | Description | Example |
+|:-----------------------|:-----------------------|:-----------------------|
+| `file` | Raw DAM monitor filename, including extension | `Monitor1.txt` |
+| `start_datetime` | Experiment start (`YYYY-MM-DD HH:MM:SS`) | `2025-02-12 06:04:00` |
+| `stop_datetime` | Experiment end (`YYYY-MM-DD HH:MM:SS`) | `2025-02-15 09:00:00` |
+| `region_id` | Channel number on the DAM monitor (1–32) | `1` |
+| `genotype` | Genotype or treatment group label | `CantonS` |
+| `replicate` | Replicate identifier (won't affect calculations if absent) | `1` |
+| `sex` | Sex identifier (won't affect calculations if absent) | `Female` |
 
-#### Columns (first five are required)
-
-| Column Header | Description | Example |
-|:---|:---|:---|
-| **`file`** | The full filename of the raw DAM monitor file, including the extension. | `Monitor1.txt` |
-| **`start_datetime`** | The exact date and time the experiment started (Format: `YYYY-MM-DD HH:MM:SS`). | `2025-02-12 06:04:00` |
-| **`stop_datetime`** | The exact date and time the experiment ended. | `2025-02-15 09:00:00` |
-| **`region_id`** | The specific channel number (1–32) on the DAM monitor for this fly. | `1` |
-| **`genotype`** | The experimental genotype identifier or treatment group. | `CantonS` |
-| **`replicate`** | The replicate identifier. (Note: If you do not have replicates, that does not affect calculations). | `1` |
-| **`sex`** | The sex identifier. (Note: If you do not have different sexes, that does not affect calculations). | `Female` |
+The first five columns are required; `replicate` and `sex` are optional.
 
 ------------------------------------------------------------------------
 
-## 💡 Common Issues
+## Common issues
 
--   **Problem: HMM fitting is slow**
+**HMM fitting is slow:** Use `HMMbehavrFast()` and set `n_cores` to one less than your total CPU core count.
 
-    **Solution:** Use `HMMbehavrFast()` with `n_cores` set to your CPU core count minus 1 to enable parallel processing.
+**Fitting has been running for more than 15 minutes:** If you're already using multiple cores, the most likely cause is dead flies in your data — the algorithm can get stuck on flat activity traces. Check your data for flies that stopped moving partway through the experiment.
 
--   **Problem: HMM fitting is taking longer than 15 minutes**
+**Plots look different from the tutorial:** Make sure you have the latest versions of `ggplot2` and `patchwork` installed, as their layout logic has changed across versions.
 
-    **Solution:** If you are already using `HmmbehavrFast()` with multiple cores, most probably you have dead flies in your data, and the algorithm gets stuck there.
-
--   **Problem: Plots look different from the tutorial**
-
-    **Solution:** Ensure you have the latest versions of `ggplot2` and `patchwork` installed, as layout logic can vary between versions.
-
--   **Problem: Heatmap hypnograms show greyed out days**
-
-    **Solution:** This indicates the HMM did not find a suitable solution for those days. Rerun the analysis with a higher number of iterations. If many days are greyed out, check if the fly died during experiment.
+**Heatmap hypnograms show greyed-out days:** This means the HMM did not converge for those days. Try rerunning with a higher iteration limit. If many days are greyed out for the same fly, it probably died during the experiment.
 
 ------------------------------------------------------------------------
 
-## 📖 Citation
+## Citation
 
 If you use FlyDreamR in your research, please cite:
 
-```         
-Ghosh, Arijit, and Susan T. Harbison. "Inferring the genetic basis of sleep states in Drosophila melanogaster using hidden Markov models." bioRxiv (2026): 2026-01.
-```
+> Ghosh, Arijit, and Susan T. Harbison. "Inferring the genetic basis of sleep states in *Drosophila melanogaster* using hidden Markov models." *bioRxiv* (2026): 2026-01.
 
 ------------------------------------------------------------------------
 
-## 🤝 Contributing
+## Contributing
 
-Issues and pull requests are welcome! Please visit the [GitHub Issues page](https://github.com/orijitghosh/FlyDreamR/issues) to report bugs or request features.
-
-------------------------------------------------------------------------
-
-## 📧 Contact
-
-For questions or support, please contact the **Author**: Arijit Ghosh, and **Issues** can be documented at <https://github.com/orijitghosh/FlyDreamR/issues>.
+Bug reports and pull requests are welcome. Please use the [GitHub Issues page](https://github.com/orijitghosh/FlyDreamR/issues).
 
 ------------------------------------------------------------------------
 
-## 📄 License
+## Contact
 
-This project is released under the [GNU General Public License, version 3 (GPL-3)](LICENSE).
+**Author:** Arijit Ghosh. For bugs and feature requests, open an issue at <https://github.com/orijitghosh/FlyDreamR/issues>.
 
 ------------------------------------------------------------------------
+
+## License
+
+Released under the [GNU General Public License v3 (GPL-3)](LICENSE).

@@ -58,7 +58,7 @@
 #'
 #' @details
 #' ## State Interpretation
-#' States are ordered by median activity level:
+#' States are ordered by mean activity level:
 #' \itemize{
 #'   \item \strong{State0}: Highest activity (active wake)
 #'   \item \strong{State1}: Moderate activity (quiet wake)
@@ -262,8 +262,8 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
                         # Summarize activity within each inferred state to order them
                         state_summary <- ordered_states %>%
                           dplyr::group_by(state) %>%
-                          dplyr::summarise(median_activity = median(normact), .groups = "drop") %>%
-                          dplyr::arrange(dplyr::desc(median_activity))
+                          dplyr::summarise(mean_activity = mean(normact), .groups = "drop") %>%
+                          dplyr::arrange(dplyr::desc(mean_activity))
 
                         # Assign a more descriptive name to each state based on activity level
                         state_summary$state_name <- paste0("State", seq(0, nrow(state_summary) - 1))
