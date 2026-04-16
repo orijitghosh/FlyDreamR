@@ -90,7 +90,7 @@ A list containing two data frames:
 
 ### State Interpretation
 
-States are ordered by median activity level:
+States are ordered by mean activity level:
 
 - **State0**: Highest activity (active wake)
 
