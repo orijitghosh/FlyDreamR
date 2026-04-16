@@ -1,17 +1,14 @@
 # Analyzing Sleep States with FlyDreamR
 
-`FlyDreamR` is an R package for analyzing *Drosophila* Activity Monitor
-(DAM) data, with workflows for:
+The standard way to measure sleep in *Drosophila*, calling any
+five-minute stretch of immobility “sleep”, flattens what is almost
+certainly a richer biological signal. **FlyDreamR** fits a hidden Markov
+model to your DAM activity data to recover that signal, classifying each
+minute of recording into distinct sleep and wake states rather than
+applying a single arbitrary threshold.
 
-- Preparing DAM master/monitor files for downstream analyses
-- Traditional sleep metrics (sleep time, bout statistics, activity
-  indices, brief awakenings)
-- Hidden Markov Models (HMMs) to infer discrete behavioral states and
-  visualize state dynamics
-- An optional Shiny app for interactive analysis
-
-This vignette gives a short roadmap and points you to the more focused
-vignettes included with the package.
+This vignette is a quick roadmap. If you want to get straight to
+analysis, pick the vignette that matches your goal.
 
 ## What to read next
 

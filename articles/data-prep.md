@@ -93,6 +93,11 @@ dt <- HMMDataPrep(
 dt
 ```
 
+The result is a `behavr` table with one row per minute per fly,
+containing columns for raw activity counts (`activity`), sleep
+annotation (`asleep`), day number (`day`), light/dark phase (`phase`),
+and normalized activity (`normact`).
+
 The resulting table can be passed into:
 
 - [`calcTradSleep()`](https://orijitghosh.github.io/FlyDreamR/reference/calcTradSleep.md)

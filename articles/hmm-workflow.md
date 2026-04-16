@@ -73,6 +73,10 @@ HMMSinglePlot(res)
 
 ## Summarize time spent in each state
 
+`TimeSpentInEachState` summarizes how many minutes each fly spent in
+each inferred state per day and phase. `VITERBIDecodedProfile` contains
+the full minute-by-minute decoded state sequence for every fly.
+
 The HMM results typically include:
 
 - `TimeSpentInEachState` (summaries)

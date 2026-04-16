@@ -1,0 +1,31 @@
+/* Navbar bottom accent */
+.navbar {
+  border-bottom: 2px solid #00c896;
+}
+
+/* Link hover */
+a:hover {
+  color: #00c896;
+}
+
+/* Reference index section left border */
+.template-reference-index .section {
+  border-left: 3px solid #00c896;
+  padding-left: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Slightly softer code blocks */
+pre, code {
+  border-radius: 6px;
+}
+
+/* Homepage sidebar links */
+.sidebar .list-unstyled a {
+  color: #00c896;
+}
+
+/* Make the logo in the navbar a bit larger */
+.navbar-brand img {
+  max-height: 40px;
+}

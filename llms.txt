@@ -1,6 +1,6 @@
 # FlyDreamR ![](https://img.shields.io/badge/R-%3E%3D%204.0-276DC3)
 
-![FlyDreamR logo](articles/FlyDreamR_logo.png)
+![](reference/figures/FlyDreamR_logo.png)
 
 > **Infer sleep/wake states from locomotor activity data using hidden
 > Markov models (HMMs).**
@@ -58,7 +58,7 @@ work in R directly.
 ## Installation
 
 ``` r
-install.packages(c('devtools', 'remotes'), repos = 'https://cloud.r-project.org')
+install.packages('remotes'), repos = 'https://cloud.r-project.org')
 remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
 ```
 
@@ -138,8 +138,8 @@ Released under the [GNU General Public License v3
 
 ## Metadata & Data Import
 
-Functions to convert raw master files into the metadata format required
-to link experimental conditions with monitor files.
+Convert raw master files into the metadata format required to link
+experimental conditions with monitor files.
 
 - [`convMasterToMeta()`](https://orijitghosh.github.io/FlyDreamR/reference/convMasterToMeta.md)
   : Convert Master File to FlyDreamR Metadata Format
@@ -148,16 +148,16 @@ to link experimental conditions with monitor files.
 
 ## Data Preparation
 
-Functions to load DAM activity data, link it with metadata, and
-calculate normalized activity and phases.
+Load DAM activity data, link it with metadata, and calculate normalized
+activity, day number, and light/dark phase.
 
 - [`HMMDataPrep()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMDataPrep.md)
   : Prepare DAM Activity Data for HMM Analysis
 
 ## HMM Analysis
 
-The core functions for running Hidden Markov Models to infer sleep/wake
-states.
+Fit hidden Markov models to infer sleep and wake states from activity
+counts, serially or in parallel.
 
 - [`HMMbehavr()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMbehavr.md)
   : Infer Sleep States Using Hidden Markov Model
@@ -166,8 +166,8 @@ states.
 
 ## Visualization
 
-Tools for visualizing inferred states using heatmaps, faceted plots, or
-individual profiles.
+Plot inferred states as heatmap hypnograms, faceted group profiles, or
+individual daily profiles.
 
 - [`HMMplot()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMplot.md)
   : Plot HMM Inferred Sleep States as Tile Heatmap
@@ -176,17 +176,17 @@ individual profiles.
 - [`HMMSinglePlot()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMSinglePlot.md)
   : Save Individual HMM State Plots to Disk
 
-## Traditional Metrics
+## Traditional Sleep Metrics
 
-Functions to calculate standard sleep metrics (immobility bouts) for
-comparison with HMM results.
+Calculate standard immobility-based sleep metrics for comparison with
+HMM results.
 
 - [`calcTradSleep()`](https://orijitghosh.github.io/FlyDreamR/reference/calcTradSleep.md)
   : Calculate Comprehensive Sleep Metrics from Activity Data
 
-## Interactive Analysis
+## Shiny App
 
-Functions to launch the graphical user interface (Shiny App).
+Launch the interactive GUI for point-and-click analysis.
 
 - [`runFlyDreamRApp()`](https://orijitghosh.github.io/FlyDreamR/reference/runFlyDreamRApp.md)
   : Launch the FlyDreamR Shiny App

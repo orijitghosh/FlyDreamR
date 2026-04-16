@@ -1,6 +1,6 @@
 # FlyDreamR ![](https://img.shields.io/badge/R-%3E%3D%204.0-276DC3)
 
-![FlyDreamR logo](articles/FlyDreamR_logo.png)
+![](reference/figures/FlyDreamR_logo.png)
 
 > **Infer sleep/wake states from locomotor activity data using hidden
 > Markov models (HMMs).**
@@ -58,7 +58,7 @@ work in R directly.
 ## Installation
 
 ``` r
-install.packages(c('devtools', 'remotes'), repos = 'https://cloud.r-project.org')
+install.packages('remotes'), repos = 'https://cloud.r-project.org')
 remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
 ```
 
