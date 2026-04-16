@@ -1,6 +1,6 @@
 # FlyDreamR <img src="https://img.shields.io/badge/R-%3E%3D%204.0-276DC3" align="right"/>
 
-<img src="vignettes/FlyDreamR_logo.png" alt="FlyDreamR logo" width="200" align="right"/>
+<img src="man/figures/FlyDreamR_logo.png" align="right" width="120"/>
 
 > **Infer sleep/wake states from locomotor activity data using hidden Markov models (HMMs).**
 

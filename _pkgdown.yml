@@ -1,10 +1,10 @@
-url: https://orijitghosh.github.io/FlyDreamR/ # Replace with my actual URL
+url: https://orijitghosh.github.io/FlyDreamR/
 
 template:
   bootstrap: 5
   bootswatch: zephyr
   light-switch: true
-  theme: ayu-light # Code highlighting theme
+  theme: ayu-light
   theme-dark: ayu-dark
   params:
     logo: vignettes/FlyDreamR_logo.png
@@ -15,14 +15,13 @@ navbar:
     right: [search, github, lightswitch]
   components:
     intro:
-      text: "Get Started"
+      text: "Overview"
       href: articles/introduction.html
     github:
       icon: fab fa-github
       href: https://github.com/orijitghosh/FlyDreamR
       aria-label: GitHub
 
-# This section tells pkgdown how to organize your articles dropdown
 articles:
   - title: Get started
     navbar: ~
@@ -40,7 +39,7 @@ articles:
 reference:
   - title: "Metadata & Data Import"
     desc: >
-      Functions to convert raw master files into the metadata format required
+      Convert raw master files into the metadata format required
       to link experimental conditions with monitor files.
     contents:
       - convMasterToMeta
@@ -48,37 +47,37 @@ reference:
 
   - title: "Data Preparation"
     desc: >
-      Functions to load DAM activity data, link it with metadata, and
-      calculate normalized activity and phases.
+      Load DAM activity data, link it with metadata, and calculate
+      normalized activity, day number, and light/dark phase.
     contents:
       - HMMDataPrep
 
   - title: "HMM Analysis"
     desc: >
-      The core functions for running Hidden Markov Models to infer
-      sleep/wake states.
+      Fit hidden Markov models to infer sleep and wake states from
+      activity counts, serially or in parallel.
     contents:
       - HMMbehavr
       - HMMbehavrFast
 
   - title: "Visualization"
     desc: >
-      Tools for visualizing inferred states using heatmaps, faceted plots,
-      or individual profiles.
+      Plot inferred states as heatmap hypnograms, faceted group profiles,
+      or individual daily profiles.
     contents:
       - HMMplot
       - HMMFacetedPlot
       - HMMSinglePlot
 
-  - title: "Traditional Metrics"
+  - title: "Traditional Sleep Metrics"
     desc: >
-      Functions to calculate standard sleep metrics (immobility bouts)
-      for comparison with HMM results.
+      Calculate standard immobility-based sleep metrics for comparison
+      with HMM results.
     contents:
       - calcTradSleep
 
-  - title: "Interactive Analysis"
+  - title: "Shiny App"
     desc: >
-      Functions to launch the graphical user interface (Shiny App).
+      Launch the interactive GUI for point-and-click analysis.
     contents:
       - runFlyDreamRApp
