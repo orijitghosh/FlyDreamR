@@ -70,68 +70,34 @@
 </h1></div>
 <p><img src="articles/FlyDreamR_logo.png" alt="FlyDreamR logo" width="200" align="right"></p>
 <blockquote>
-<p><strong>Infer Sleep/Wake States from locomotor activity data using hidden Markov models (HMMs).</strong></p>
+<p><strong>Infer sleep/wake states from locomotor activity data using hidden Markov models (HMMs).</strong></p>
 </blockquote>
 <p><a href="https://lifecycle.r-lib.org/articles/stages.html" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3-blue.svg" alt="License: GPL-3"></a> <a href="#"><img src="https://img.shields.io/badge/status-active-success" alt="Repo status"></a> <a href="https://github.com/orijitghosh/FlyDreamR/issues" class="external-link"><img src="https://img.shields.io/github/issues/orijitghosh/FlyDreamR.svg" alt="Issues"></a></p>
-<p><strong>FlyDreamR</strong> implements an iterative <strong>hidden Markov model (HMM)</strong> framework to infer <em>sleep</em> and <em>wake</em> states from <em>Drosophila</em> Activity Monitor (DAM) <strong>activity counts</strong>. It streamlines the entire analysis pipeline:</p>
-<ul>
-<li>
-<strong>Data Loading:</strong> Import raw DAM monitor files and link them with experimental metadata.</li>
-<li>
-<strong>Pre-processing:</strong> Clean data and engineer features for HMM analysis.</li>
-<li>
-<strong>Inference:</strong> Infer sleep states using serial or parallel processing.</li>
-<li>
-<strong>Analysis:</strong> Generate publication-ready visualizations and sleep metrics.</li>
-</ul>
-<p>For detailed guides and walk through, visit <a href="https://orijitghosh.github.io/FlyDreamR/" class="uri">https://orijitghosh.github.io/FlyDreamR/</a>.</p>
+<p><strong>FlyDreamR</strong> fits an iterative 4-state hidden Markov model to <em>Drosophila</em> Activity Monitor (DAM) activity counts to classify each minute of recording as sleep or wake. It covers the full pipeline: loading raw monitor files, linking them to metadata, running the HMM (serially or in parallel), and producing summary plots and metrics.</p>
+<p>For detailed guides and walkthroughs, visit <a href="https://orijitghosh.github.io/FlyDreamR/" class="uri">https://orijitghosh.github.io/FlyDreamR/</a>.</p>
 <hr>
 <div class="section level2">
-<h2 id="sparkles-highlights">✨ Highlights<a class="anchor" aria-label="anchor" href="#sparkles-highlights"></a>
+<h2 id="what-it-does">What it does<a class="anchor" aria-label="anchor" href="#what-it-does"></a>
 </h2>
-<ul>
-<li>
-<strong>End-to-end pipeline</strong>: from metadata to publication-ready figures.</li>
-<li>
-<strong>Dual analysis modes</strong>: Traditional sleep metrics AND advanced HMM-based state inference.</li>
-<li>
-<strong>Traditional sleep metrics</strong> (<code><a href="reference/calcTradSleep.html">calcTradSleep()</a></code>): Define sleep as you wish, for 5 minutes to 60 minutes of immobility, bout counts/lengths, activity index, brief awakenings, day/phase summaries.</li>
-<li>
-<strong>Robust inference</strong> with a configurable HMM and decoding.</li>
-<li>
-<strong>Parallel execution</strong> via <code><a href="reference/HMMbehavrFast.html">HMMbehavrFast()</a></code> for big data.</li>
-<li>
-<strong>Rich visualization suite</strong>: Heatmap hypnograms, faceted profiles, and individual profiles, per day.</li>
-<li>
-<strong>Interactive Shiny GUI</strong> for users who prefer point-and-click analysis.</li>
-</ul>
+<p><strong>Data preparation</strong> (<code><a href="reference/HMMDataPrep.html">HMMDataPrep()</a></code>): the first step in the pipeline. Reads raw DAM monitor files, links them to your metadata, and returns a <code>behavr</code> table with day, light/dark phase, and normalized activity calculated and ready for HMM fitting.</p>
+<p><strong>Traditional sleep analysis</strong> (<code><a href="reference/calcTradSleep.html">calcTradSleep()</a></code>): define sleep as immobility of 5–60 minutes; returns bout counts, bout lengths, activity index, brief awakenings, and day/phase summaries.</p>
+<p><strong>HMM-based state inference</strong>: fits a per-fly, per-day HMM with configurable emission distributions and Viterbi decoding. Use <code><a href="reference/HMMbehavr.html">HMMbehavr()</a></code> for serial fitting or <code><a href="reference/HMMbehavrFast.html">HMMbehavrFast()</a></code> for parallel fitting across CPU cores.</p>
+<p><strong>Visualization</strong>: heatmap hypnograms (<code><a href="reference/HMMplot.html">HMMplot()</a></code>), faceted group profiles (<code><a href="reference/HMMFacetedPlot.html">HMMFacetedPlot()</a></code>), and single-fly daily profiles (<code><a href="reference/HMMSinglePlot.html">HMMSinglePlot()</a></code>).</p>
+<p><strong>Shiny GUI</strong>: a point-and-click interface for users who prefer not to work in R directly.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="package-installation">📦 Installation<a class="anchor" aria-label="anchor" href="#package-installation"></a>
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<div class="section level3">
-<h3 id="from-github-recommended">From GitHub (recommended)<a class="anchor" aria-label="anchor" href="#from-github-recommended"></a>
-</h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install from GitHub (devtools or remotes)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'devtools'</span>,<span class="st">'remotes'</span><span class="op">)</span>, repos<span class="op">=</span><span class="st">'https://cloud.r-project.org'</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'devtools'</span>, <span class="st">'remotes'</span><span class="op">)</span>, repos <span class="op">=</span> <span class="st">'https://cloud.r-project.org'</span><span class="op">)</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'orijitghosh/FlyDreamR'</span>, upgrade <span class="op">=</span> <span class="st">'never'</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
-<div class="section level3">
-<h3 id="pencil-data-preparation-metadata-file">📝 Data Preparation: Metadata File<a class="anchor" aria-label="anchor" href="#pencil-data-preparation-metadata-file"></a>
-</h3>
-<p>To link your raw monitor files with experimental conditions, you must create a <strong>Metadata CSV file</strong>. This file maps each specific monitor file and channel to the corresponding fly’s genotype and experiment timing.</p>
-<ul>
-<li>
-<strong>Format:</strong> <code>.csv</code> (Comma Separated Values)</li>
-<li>
-<strong>Rows:</strong> One row per fly (channel).</li>
-</ul>
-<div class="section level4">
-<h4 id="columns-first-five-are-required">Columns (first five are required)<a class="anchor" aria-label="anchor" href="#columns-first-five-are-required"></a>
-</h4>
+<div class="section level2">
+<h2 id="data-preparation-metadata-file">Data preparation: metadata file<a class="anchor" aria-label="anchor" href="#data-preparation-metadata-file"></a>
+</h2>
+<p>You need a CSV file that maps each monitor channel to a fly’s experimental conditions. One row per fly.</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -139,99 +105,85 @@
 <col width="33%">
 </colgroup>
 <thead><tr>
-<th align="left">Column Header</th>
+<th align="left">Column</th>
 <th align="left">Description</th>
 <th align="left">Example</th>
 </tr></thead>
 <tbody>
 <tr>
-<td align="left"><strong><code>file</code></strong></td>
-<td align="left">The full filename of the raw DAM monitor file, including the extension.</td>
+<td align="left"><code>file</code></td>
+<td align="left">Raw DAM monitor filename, including extension</td>
 <td align="left"><code>Monitor1.txt</code></td>
 </tr>
 <tr>
-<td align="left"><strong><code>start_datetime</code></strong></td>
-<td align="left">The exact date and time the experiment started (Format: <code>YYYY-MM-DD HH:MM:SS</code>).</td>
+<td align="left"><code>start_datetime</code></td>
+<td align="left">Experiment start (<code>YYYY-MM-DD HH:MM:SS</code>)</td>
 <td align="left"><code>2025-02-12 06:04:00</code></td>
 </tr>
 <tr>
-<td align="left"><strong><code>stop_datetime</code></strong></td>
-<td align="left">The exact date and time the experiment ended.</td>
+<td align="left"><code>stop_datetime</code></td>
+<td align="left">Experiment end (<code>YYYY-MM-DD HH:MM:SS</code>)</td>
 <td align="left"><code>2025-02-15 09:00:00</code></td>
 </tr>
 <tr>
-<td align="left"><strong><code>region_id</code></strong></td>
-<td align="left">The specific channel number (1–32) on the DAM monitor for this fly.</td>
+<td align="left"><code>region_id</code></td>
+<td align="left">Channel number on the DAM monitor (1–32)</td>
 <td align="left"><code>1</code></td>
 </tr>
 <tr>
-<td align="left"><strong><code>genotype</code></strong></td>
-<td align="left">The experimental genotype identifier or treatment group.</td>
+<td align="left"><code>genotype</code></td>
+<td align="left">Genotype or treatment group label</td>
 <td align="left"><code>CantonS</code></td>
 </tr>
 <tr>
-<td align="left"><strong><code>replicate</code></strong></td>
-<td align="left">The replicate identifier. (Note: If you do not have replicates, that does not affect calculations).</td>
+<td align="left"><code>replicate</code></td>
+<td align="left">Replicate identifier (won’t affect calculations if absent)</td>
 <td align="left"><code>1</code></td>
 </tr>
 <tr>
-<td align="left"><strong><code>sex</code></strong></td>
-<td align="left">The sex identifier. (Note: If you do not have different sexes, that does not affect calculations).</td>
+<td align="left"><code>sex</code></td>
+<td align="left">Sex identifier (won’t affect calculations if absent)</td>
 <td align="left"><code>Female</code></td>
 </tr>
 </tbody>
 </table>
+<p>The first five columns are required; <code>replicate</code> and <code>sex</code> are optional.</p>
 <hr>
 </div>
-</div>
-</div>
 <div class="section level2">
-<h2 id="bulb-common-issues">💡 Common Issues<a class="anchor" aria-label="anchor" href="#bulb-common-issues"></a>
+<h2 id="common-issues">Common issues<a class="anchor" aria-label="anchor" href="#common-issues"></a>
 </h2>
-<ul>
-<li>
-<p><strong>Problem: HMM fitting is slow</strong></p>
-<p><strong>Solution:</strong> Use <code><a href="reference/HMMbehavrFast.html">HMMbehavrFast()</a></code> with <code>n_cores</code> set to your CPU core count minus 1 to enable parallel processing.</p>
-</li>
-<li>
-<p><strong>Problem: HMM fitting is taking longer than 15 minutes</strong></p>
-<p><strong>Solution:</strong> If you are already using <code>HmmbehavrFast()</code> with multiple cores, most probably you have dead flies in your data, and the algorithm gets stuck there.</p>
-</li>
-<li>
-<p><strong>Problem: Plots look different from the tutorial</strong></p>
-<p><strong>Solution:</strong> Ensure you have the latest versions of <code>ggplot2</code> and <code>patchwork</code> installed, as layout logic can vary between versions.</p>
-</li>
-<li>
-<p><strong>Problem: Heatmap hypnograms show greyed out days</strong></p>
-<p><strong>Solution:</strong> This indicates the HMM did not find a suitable solution for those days. Rerun the analysis with a higher number of iterations. If many days are greyed out, check if the fly died during experiment.</p>
-</li>
-</ul>
+<p><strong>HMM fitting is slow:</strong> Use <code><a href="reference/HMMbehavrFast.html">HMMbehavrFast()</a></code> and set <code>n_cores</code> to one less than your total CPU core count.</p>
+<p><strong>Fitting has been running for more than 15 minutes:</strong> If you’re already using multiple cores, the most likely cause is dead flies in your data — the algorithm can get stuck on flat activity traces. Check your data for flies that stopped moving partway through the experiment.</p>
+<p><strong>Plots look different from the tutorial:</strong> Make sure you have the latest versions of <code>ggplot2</code> and <code>patchwork</code> installed, as their layout logic has changed across versions.</p>
+<p><strong>Heatmap hypnograms show greyed-out days:</strong> This means the HMM did not converge for those days. Try rerunning with a higher iteration limit. If many days are greyed out for the same fly, it probably died during the experiment.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="open_book-citation">📖 Citation<a class="anchor" aria-label="anchor" href="#open_book-citation"></a>
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
 <p>If you use FlyDreamR in your research, please cite:</p>
-<pre><code>Ghosh, Arijit, and Susan T. Harbison. "Inferring the genetic basis of sleep states in Drosophila melanogaster using hidden Markov models." bioRxiv (2026): 2026-01.</code></pre>
+<blockquote>
+<p>Ghosh, Arijit, and Susan T. Harbison. “Inferring the genetic basis of sleep states in <em>Drosophila melanogaster</em> using hidden Markov models.” <em>bioRxiv</em> (2026): 2026-01.</p>
+</blockquote>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="handshake-contributing">🤝 Contributing<a class="anchor" aria-label="anchor" href="#handshake-contributing"></a>
+<h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
 </h2>
-<p>Issues and pull requests are welcome! Please visit the <a href="https://github.com/orijitghosh/FlyDreamR/issues" class="external-link">GitHub Issues page</a> to report bugs or request features.</p>
+<p>Bug reports and pull requests are welcome. Please use the <a href="https://github.com/orijitghosh/FlyDreamR/issues" class="external-link">GitHub Issues page</a>.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="e-mail-contact">📧 Contact<a class="anchor" aria-label="anchor" href="#e-mail-contact"></a>
+<h2 id="contact">Contact<a class="anchor" aria-label="anchor" href="#contact"></a>
 </h2>
-<p>For questions or support, please contact the <strong>Author</strong>: Arijit Ghosh, and <strong>Issues</strong> can be documented at <a href="https://github.com/orijitghosh/FlyDreamR/issues" class="external-link uri">https://github.com/orijitghosh/FlyDreamR/issues</a>.</p>
+<p><strong>Author:</strong> Arijit Ghosh. For bugs and feature requests, open an issue at <a href="https://github.com/orijitghosh/FlyDreamR/issues" class="external-link uri">https://github.com/orijitghosh/FlyDreamR/issues</a>.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="page_facing_up-license">📄 License<a class="anchor" aria-label="anchor" href="#page_facing_up-license"></a>
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
 </h2>
-<p>This project is released under the <a href="LICENSE">GNU General Public License, version 3 (GPL-3)</a>.</p>
-<hr>
+<p>Released under the <a href="LICENSE">GNU General Public License v3 (GPL-3)</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
