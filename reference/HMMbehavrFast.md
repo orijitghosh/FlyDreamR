@@ -13,7 +13,7 @@ automatically handles cluster setup and cleanup.
 ## Usage
 
 ``` r
-HMMbehavrFast(behavtbl, it = 100, n_cores = 4, ldcyc = NULL)
+HMMbehavrFast(behavtbl, it = 100, n_cores = 4, ldcyc = NULL, n_states = 4L)
 ```
 
 ## Arguments
@@ -55,9 +55,13 @@ HMMbehavrFast(behavtbl, it = 100, n_cores = 4, ldcyc = NULL)
   [`HMMbehavr`](https://orijitghosh.github.io/FlyDreamR/reference/HMMbehavr.md)
   for details.
 
+- n_states:
+
+  Number of states to fit: 3, 4, or 5. Default: 4.
+
 ## Value
 
-A list containing two data frames with combined results from all
+A list containing three data frames with combined results from all
 individuals:
 
 - `TimeSpentInEachState`:
@@ -67,6 +71,10 @@ individuals:
 - `VITERBIDecodedProfile`:
 
   HMM-inferred state profiles for all individuals
+
+- `QualityReport`:
+
+  Fit status and reason for each individual and day
 
 See
 [`HMMbehavr`](https://orijitghosh.github.io/FlyDreamR/reference/HMMbehavr.md)
@@ -116,9 +124,8 @@ For 32 individuals, 3 days each, it=100:
 
 ### Error Handling
 
-If any individual fails to process, that individual returns `NULL` and
-is excluded from the final results. Other individuals continue
-processing normally.
+Failed individual-days are recorded in `QualityReport`. Unexpected
+worker errors stop the call.
 
 ## See also
 

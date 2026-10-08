@@ -234,6 +234,7 @@ Only rows with `SetupCode = 1` will be included in the output metadata.
 
 ## Example Master File
 
+
     53  1   w1118   F   control   1   1   1
     53  2   w1118   F   control   1   1   1
     53  3   mutant  M   drug      1   1   1

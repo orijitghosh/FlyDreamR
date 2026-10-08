@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Traditional sleep analyses • FlyDreamR</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Traditional sleep analyses">
@@ -73,7 +73,7 @@
       <h1>Traditional sleep analyses</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/orijitghosh/FlyDreamR/blob/HEAD/vignettes/traditional-sleep.Rmd" class="external-link"><code>vignettes/traditional-sleep.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/orijitghosh/FlyDreamR/blob/main/vignettes/traditional-sleep.Rmd" class="external-link"><code>vignettes/traditional-sleep.Rmd</code></a></small>
       <div class="d-none name"><code>traditional-sleep.Rmd</code></div>
     </div>
 
@@ -129,18 +129,18 @@ visualizations.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rethomics/ggetho" class="external-link">ggetho</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Somnogram-like ethogram</span></span>
-<span><span class="fu">ggetho</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggetho/man/ggetho.html" class="external-link">ggetho</a></span><span class="op">(</span><span class="va">dt_5min</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, z <span class="op">=</span> <span class="va">asleep</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggetho</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggetho/man/stat_tile_etho.html" class="external-link">stat_bar_tile_etho</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">ggetho</span><span class="fu">::</span><span class="fu">ggetho</span><span class="op">(</span><span class="va">dt_5min</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, z <span class="op">=</span> <span class="va">asleep</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggetho</span><span class="fu">::</span><span class="fu">stat_bar_tile_etho</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Sleep profile by genotype</span></span>
-<span><span class="fu">ggetho</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggetho/man/ggetho.html" class="external-link">ggetho</a></span><span class="op">(</span><span class="va">dt_5min</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">asleep</span>, color <span class="op">=</span> <span class="va">genotype</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggetho</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggetho/man/stat_pop_etho.html" class="external-link">stat_pop_etho</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">ggetho</span><span class="fu">::</span><span class="fu">ggetho</span><span class="op">(</span><span class="va">dt_5min</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">asleep</span>, color <span class="op">=</span> <span class="va">genotype</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggetho</span><span class="fu">::</span><span class="fu">stat_pop_etho</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Facet by genotype + LD annotations</span></span>
-<span><span class="fu">ggetho</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggetho/man/ggetho.html" class="external-link">ggetho</a></span><span class="op">(</span><span class="va">dt_5min</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">asleep</span>, color <span class="op">=</span> <span class="va">genotype</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggetho</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggetho/man/stat_pop_etho.html" class="external-link">stat_pop_etho</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu">ggetho</span><span class="fu">::</span><span class="fu">ggetho</span><span class="op">(</span><span class="va">dt_5min</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">asleep</span>, color <span class="op">=</span> <span class="va">genotype</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggetho</span><span class="fu">::</span><span class="fu">stat_pop_etho</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">genotype</span> <span class="op">~</span> <span class="va">.</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggetho</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggetho/man/stat_ld_annotations.html" class="external-link">stat_ld_annotations</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">ggetho</span><span class="fu">::</span><span class="fu">stat_ld_annotations</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="plot-summary-sleep-time-by-daynight">Plot summary sleep time by day/night<a class="anchor" aria-label="anchor" href="#plot-summary-sleep-time-by-daynight"></a>
@@ -163,7 +163,7 @@ visualizations.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

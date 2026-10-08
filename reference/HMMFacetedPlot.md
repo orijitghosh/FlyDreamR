@@ -32,7 +32,8 @@ HMMFacetedPlot(HMMinferList, col_palette = "default")
 
   - `timestamp`: Time point index (1 to 1440 for minute resolution)
 
-  - `state_name`: State label (State0, State1, State2, State3)
+  - `state_name`: State label (State0 to State2, State3, or State4,
+    depending on the fitted state count)
 
   - `genotype`: Genotype identifier
 
@@ -56,7 +57,7 @@ A `ggplot2` object displaying a faceted plot with:
 
 - **X-axis**: Time in hours (0-24)
 
-- **Y-axis**: State names (State0 through State3)
+- **Y-axis**: Fitted state names
 
 - **Facets**: One panel per individual-day combination, arranged in a
   grid. Facet labels show ID and "Day: N"
@@ -84,6 +85,9 @@ saved using
 - State2 (light sleep): \#33c5e8 (light blue)
 
 - State3 (deep sleep): \#004a73 (dark blue)
+
+These descriptions are for the four-state default. Three- and five-state
+palettes are interpolated from these colors.
 
 **AG palette:**
 

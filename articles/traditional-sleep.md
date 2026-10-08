@@ -13,6 +13,7 @@ with
 and a chosen `min_time_immobile` definition.
 
 ``` r
+
 # Load demo data
 meta_file <- system.file("extdata", "Metadata_Monitor1.csv", package = "FlyDreamR")
 data_dir <- system.file("extdata", package = "FlyDreamR")
@@ -30,6 +31,7 @@ trad_5min
 ```
 
 ``` r
+
 # 60-minute sleep definition
 dt_60min <- HMMDataPrep(
   metafile_path = meta_file,
@@ -53,6 +55,7 @@ A common plotting workflow uses `ggetho` (for ethograms/profiles) and
 `ggplot2` for summary visualizations.
 
 ``` r
+
 library(ggplot2)
 library(ggetho)
 
@@ -74,6 +77,7 @@ ggetho::ggetho(dt_5min, mapping = aes(x = t, y = asleep, color = genotype)) +
 ## Plot summary sleep time by day/night
 
 ``` r
+
 ggplot2::ggplot(trad_5min$sleep_summary_phase,
                 ggplot2::aes(x = genotype, y = time_spent_sleeping, fill = genotype)) +
   ggplot2::geom_boxplot(width = 0.35, outliers = FALSE) +

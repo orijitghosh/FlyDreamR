@@ -1,5 +1,5 @@
-pandoc: 3.6.3
-pkgdown: 2.2.0
+pandoc: 3.8.3
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   data-prep: data-prep.html
@@ -7,7 +7,7 @@ articles:
   introduction: introduction.html
   shiny-app: shiny-app.html
   traditional-sleep: traditional-sleep.html
-last_built: 2026-04-16T18:32Z
+last_built: 2026-10-08T20:03Z
 urls:
   reference: https://orijitghosh.github.io/FlyDreamR/reference
   article: https://orijitghosh.github.io/FlyDreamR/articles

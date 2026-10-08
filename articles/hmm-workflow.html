@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>HMM fitting and visualization • FlyDreamR</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="HMM fitting and visualization">
@@ -73,7 +73,7 @@
       <h1>HMM fitting and visualization</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/orijitghosh/FlyDreamR/blob/HEAD/vignettes/hmm-workflow.Rmd" class="external-link"><code>vignettes/hmm-workflow.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/orijitghosh/FlyDreamR/blob/main/vignettes/hmm-workflow.Rmd" class="external-link"><code>vignettes/hmm-workflow.Rmd</code></a></small>
       <div class="d-none name"><code>hmm-workflow.Rmd</code></div>
     </div>
 
@@ -104,11 +104,21 @@ machines)</li>
 <span>  day_range     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Serial</span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/HMMbehavr.html">HMMbehavr</a></span><span class="op">(</span>behavtbl <span class="op">=</span> <span class="va">dt</span>, it <span class="op">=</span> <span class="fl">100</span>, ldcyc <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
+<span><span class="co"># Serial: choose 3, 4, or 5 states (default: 4)</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/HMMbehavr.html">HMMbehavr</a></span><span class="op">(</span>behavtbl <span class="op">=</span> <span class="va">dt</span>, it <span class="op">=</span> <span class="fl">100</span>, ldcyc <span class="op">=</span> <span class="fl">12</span>, n_states <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Parallel</span></span>
-<span><span class="va">res_prl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/HMMbehavrFast.html">HMMbehavrFast</a></span><span class="op">(</span>behavtbl <span class="op">=</span> <span class="va">dt</span>, it <span class="op">=</span> <span class="fl">100</span>, ldcyc <span class="op">=</span> <span class="fl">12</span>, n_cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">res_prl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/HMMbehavrFast.html">HMMbehavrFast</a></span><span class="op">(</span>behavtbl <span class="op">=</span> <span class="va">dt</span>, it <span class="op">=</span> <span class="fl">100</span>, ldcyc <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>                         n_cores <span class="op">=</span> <span class="fl">4</span>, n_states <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check any fly-days that could not be fitted</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">QualityReport</span></span></code></pre></div>
+<p><code>QualityReport</code> has one row per attempted fly-day. Check
+<code>status</code>, <code>reason_code</code>, and <code>reason</code>
+before interpreting the plots or summaries. Failed fly-days do not
+contribute fitted states. State labels are ordered by activity; the
+biological descriptions used for the original four-state model should
+not be assumed for three- or five-state fits.</p>
 </div>
 <div class="section level2">
 <h2 id="plot-hmm-state-profiles">Plot HMM state profiles<a class="anchor" aria-label="anchor" href="#plot-hmm-state-profiles"></a>
@@ -163,6 +173,9 @@ decoded state sequence for every fly.</p>
 <code>TimeSpentInEachState</code> (summaries)</li>
 <li>
 <code>VITERBIDecodedProfile</code> (decoded state sequences)</li>
+<li>
+<code>QualityReport</code> (fit status and reason for each
+fly-day)</li>
 </ul>
 <p>You can visualize time spent per state with <code>ggplot2</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -183,7 +196,7 @@ decoded state sequence for every fly.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

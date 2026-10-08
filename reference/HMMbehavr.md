@@ -1,21 +1,20 @@
 # Infer Sleep States Using Hidden Markov Model
 
 Applies a Hidden Markov Model (HMM) to behavioral activity data to infer
-discrete sleep/wake states. The model identifies four behavioral states
-(State0-State3) ordered by activity level, where State0 represents the
-highest activity (active wake) and State3 represents the lowest activity
-(deep sleep).
+discrete sleep/wake states. States are ordered by activity level, with
+State0 representing the highest activity. Four states remain the
+default.
 
-The function fits an HMM with 4 states using Gaussian emission
-distributions for normalized activity levels. Multiple iterations are
-performed for each individual and day to ensure robust state inference,
-with the most frequently inferred state at each time point selected as
-the final classification.
+The function fits an HMM with Gaussian emission distributions for
+normalized activity levels. Multiple iterations are performed for each
+individual and day to ensure robust state inference, with the most
+frequently inferred state at each time point selected as the final
+classification.
 
 ## Usage
 
 ``` r
-HMMbehavr(behavtbl, it = 100, ldcyc = NULL)
+HMMbehavr(behavtbl, it = 100, ldcyc = NULL, n_states = 4L)
 ```
 
 ## Arguments
@@ -45,9 +44,13 @@ HMMbehavr(behavtbl, it = 100, ldcyc = NULL)
   for LD 12:12). If `NULL` (default), assumes a 12-hour light phase.
   Used to assign "light" and "dark" phase labels to time points.
 
+- n_states:
+
+  Number of states to fit: 3, 4, or 5. Default: 4.
+
 ## Value
 
-A list containing two data frames:
+A list containing three data frames:
 
 - `TimeSpentInEachState`:
 
@@ -61,7 +64,8 @@ A list containing two data frames:
 
   - `phase`: Light or dark phase
 
-  - `state_name`: State0, State1, State2, or State3
+  - `state_name`: Activity-ordered state label (State0 to State2,
+    State3, or State4, depending on the fitted state count)
 
   - `time_spent`: Minutes in that state
 
@@ -78,13 +82,19 @@ A list containing two data frames:
 
   - `state`: Raw HMM state label
 
-  - `state_name`: Activity-ordered state name (State0-State3)
+  - `state_name`: Activity-ordered state label (State0 to State2,
+    State3, or State4, depending on the fitted state count)
 
   - `phase`: Light or dark
 
   - `ID`, `Genotype`, `day`: Grouping variables
 
   - Additional metadata columns (e.g., `sex`, `treatment`)
+
+- `QualityReport`:
+
+  One row per attempted individual and day, with the requested state
+  count, valid fits, status, and reason.
 
 ## Details
 
@@ -100,6 +110,9 @@ States are ordered by mean activity level:
 
 - **State3**: Lowest activity (deep sleep)
 
+These biological labels apply to the default four-state model. With
+three or five states, labels indicate activity order only.
+
 ### Failed Cases
 
 The function tracks cases where HMM fitting fails or produces invalid
@@ -110,7 +123,8 @@ results:
 - Single-state dominance (\>99% of time in one state) - indicates
   insufficient behavioral variability
 
-Failed cases are printed to console and excluded from results.
+Failed cases are recorded in `QualityReport` and excluded from state
+summaries. Unexpected top-level errors stop the call.
 
 ### Performance Notes
 

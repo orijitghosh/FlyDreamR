@@ -52,7 +52,8 @@ HMMplot(hmm_inference_list, color_palette = "default", user_colors = NULL)
   `c("State0" = "#RRGGBB", "State1" = "#RRGGBB", ...)`
 
   If `color_palette = "user"` but this parameter is `NULL` or
-  incomplete, an error will be raised.
+  incomplete, an error will be raised. For three- or five-state fits,
+  provide one color per fitted state.
 
 ## Value
 
@@ -87,6 +88,9 @@ All palettes follow the same principle: warm colors = wake, cool colors
 - State2: \#33c5e8 (cyan, light sleep)
 
 - State3: \#004a73 (navy, deep sleep)
+
+These descriptions are for the four-state default. Three- and five-state
+palettes are interpolated from these colors.
 
 **"AG" palette:**
 

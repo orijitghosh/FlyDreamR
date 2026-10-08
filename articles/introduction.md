@@ -10,6 +10,10 @@ applying a single arbitrary threshold.
 This vignette is a quick roadmap. If you want to get straight to
 analysis, pick the vignette that matches your goal.
 
+The default HMM has four states. You can fit three or five states with
+`n_states`, remove suspected dead flies during data preparation, and
+review fit failures in `QualityReport`.
+
 ## What to read next
 
 - **Getting data into FlyDreamR**:
@@ -26,6 +30,7 @@ analysis, pick the vignette that matches your goal.
 From GitHub (recommended)
 
 ``` r
+
 # Install from GitHub (devtools or remotes)
 install.packages(c('devtools','remotes'), repos='https://cloud.r-project.org')
 remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
@@ -34,6 +39,7 @@ remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
 Then load the package:
 
 ``` r
+
 library(FlyDreamR)
 ```
 

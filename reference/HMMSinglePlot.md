@@ -53,19 +53,25 @@ to disk. It does not return plot objects.
 
 Plots are saved with the following structure:
 
+
     ./profiles_all/
       └── [Genotype]/
           ├── [ID]_day1_4states.png
           ├── [ID]_day2_4states.png
           └── ...
 
-\## File Naming Each file is named: `[ID]_day[N]_4states.png`
+The examples above use the four-state default; three- and five-state
+fits use their fitted state count in the file name.
+
+### File Naming
+
+Each file is named: `[ID]_day[N]_[K]states.png`
 
 - ID is sanitized (timestamps and pipe characters removed)
 
 - Day number is appended
 
-- Suffix "\_4states" indicates 4-state HMM
+- Suffix gives the number of fitted states (3, 4, or 5)
 
 ### Directory Creation
 

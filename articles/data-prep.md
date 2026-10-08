@@ -57,6 +57,7 @@ for a single master file, or
 to combine multiple master files into one metadata table.
 
 ``` r
+
 # Single master file -> metadata CSV
 metafile <- convMasterToMeta(
   metafile = "master1.txt",
@@ -80,6 +81,7 @@ to load the monitor file(s) associated with a metadata CSV and generate
 a cleaned dataset. Demo dataset has been provided.
 
 ``` r
+
 # Load demo data
 meta_file <- system.file("extdata", "Metadata_Monitor1.csv", package = "FlyDreamR")
 data_dir <- system.file("extdata", package = "FlyDreamR")
@@ -97,6 +99,25 @@ The result is a `behavr` table with one row per minute per fly,
 containing columns for raw activity counts (`activity`), sleep
 annotation (`asleep`), day number (`day`), light/dark phase (`phase`),
 and normalized activity (`normact`).
+
+### Optional dead-fly curation
+
+Set `removeDeadAnimals = TRUE` to screen for sustained low activity
+before analysis. When a fly meets this activity-based criterion,
+FlyDreamR removes the suspected death day and all later days. The
+console reports how many individual-days were removed; review uncertain
+cases against the raw activity record.
+
+``` r
+
+dt <- HMMDataPrep(
+  metafile_path = meta_file,
+  result_dir = data_dir,
+  ldcyc = 12,
+  day_range = c(1, 2),
+  removeDeadAnimals = TRUE
+)
+```
 
 The resulting table can be passed into:
 

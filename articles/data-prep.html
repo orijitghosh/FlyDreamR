@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Getting data into FlyDreamR • FlyDreamR</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Getting data into FlyDreamR">
@@ -73,7 +73,7 @@
       <h1>Getting data into FlyDreamR</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/orijitghosh/FlyDreamR/blob/HEAD/vignettes/data-prep.Rmd" class="external-link"><code>vignettes/data-prep.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/orijitghosh/FlyDreamR/blob/main/vignettes/data-prep.Rmd" class="external-link"><code>vignettes/data-prep.Rmd</code></a></small>
       <div class="d-none name"><code>data-prep.Rmd</code></div>
     </div>
 
@@ -213,6 +213,22 @@ fly, containing columns for raw activity counts (<code>activity</code>),
 sleep annotation (<code>asleep</code>), day number (<code>day</code>),
 light/dark phase (<code>phase</code>), and normalized activity
 (<code>normact</code>).</p>
+<div class="section level3">
+<h3 id="optional-dead-fly-curation">Optional dead-fly curation<a class="anchor" aria-label="anchor" href="#optional-dead-fly-curation"></a>
+</h3>
+<p>Set <code>removeDeadAnimals = TRUE</code> to screen for sustained low
+activity before analysis. When a fly meets this activity-based
+criterion, FlyDreamR removes the suspected death day and all later days.
+The console reports how many individual-days were removed; review
+uncertain cases against the raw activity record.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/HMMDataPrep.html">HMMDataPrep</a></span><span class="op">(</span></span>
+<span>  metafile_path <span class="op">=</span> <span class="va">meta_file</span>,</span>
+<span>  result_dir <span class="op">=</span> <span class="va">data_dir</span>,</span>
+<span>  ldcyc <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  day_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  removeDeadAnimals <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>The resulting table can be passed into:</p>
 <ul>
 <li>
@@ -221,6 +237,7 @@ light/dark phase (<code>phase</code>), and normalized activity
 <code><a href="../reference/HMMbehavr.html">HMMbehavr()</a></code> / <code><a href="../reference/HMMbehavrFast.html">HMMbehavrFast()</a></code> for HMM
 fitting</li>
 </ul>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -233,7 +250,7 @@ fitting</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

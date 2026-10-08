@@ -12,11 +12,11 @@ GPL-3](https://img.shields.io/badge/License-GPL--3-blue.svg)](https://orijitghos
 [![Repo status](https://img.shields.io/badge/status-active-success)](#)
 [![Issues](https://img.shields.io/github/issues/orijitghosh/FlyDreamR.svg)](https://github.com/orijitghosh/FlyDreamR/issues)
 
-**FlyDreamR** fits an iterative 4-state hidden Markov model to
-*Drosophila* Activity Monitor (DAM) activity counts to classify each
-minute of recording as sleep or wake. It covers the full pipeline:
-loading raw monitor files, linking them to metadata, running the HMM
-(serially or in parallel), and producing summary plots and metrics.
+**FlyDreamR** fits an iterative hidden Markov model to *Drosophila*
+Activity Monitor (DAM) activity counts. The default is four states;
+users can also fit three or five activity-ordered states. It covers
+loading raw monitor files, linking metadata, fitting serially or in
+parallel, and producing plots and summaries.
 
 For detailed guides and walkthroughs, visit
 <https://orijitghosh.github.io/FlyDreamR/>.
@@ -29,19 +29,24 @@ For detailed guides and walkthroughs, visit
 ([`HMMDataPrep()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMDataPrep.md)):
 the first step in the pipeline. Reads raw DAM monitor files, links them
 to your metadata, and returns a `behavr` table with day, light/dark
-phase, and normalized activity calculated and ready for HMM fitting.
+phase, and normalized activity calculated and ready for HMM fitting. Set
+`removeDeadAnimals = TRUE` to remove the day of suspected death and
+later days.
 
 **Traditional sleep analysis**
 ([`calcTradSleep()`](https://orijitghosh.github.io/FlyDreamR/reference/calcTradSleep.md)):
 define sleep as immobility of 5–60 minutes; returns bout counts, bout
 lengths, activity index, brief awakenings, and day/phase summaries.
 
-**HMM-based state inference**: fits a per-fly, per-day HMM with
-configurable emission distributions and Viterbi decoding. Use
+**HMM-based state inference**: fits a per-fly, per-day Gaussian HMM with
+Viterbi decoding. Use
 [`HMMbehavr()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMbehavr.md)
 for serial fitting or
 [`HMMbehavrFast()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMbehavrFast.md)
-for parallel fitting across CPU cores.
+for parallel fitting across CPU cores. Both accept `n_states = 3`, `4`,
+or `5` and return a `QualityReport` with failed fly-days and reasons.
+Biological state names in the documentation apply to the four-state
+default.
 
 **Visualization**: heatmap hypnograms
 ([`HMMplot()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMplot.md)),
@@ -58,7 +63,8 @@ work in R directly.
 ## Installation
 
 ``` r
-install.packages('remotes'), repos = 'https://cloud.r-project.org')
+
+install.packages('remotes', repos = 'https://cloud.r-project.org')
 remotes::install_github('orijitghosh/FlyDreamR', upgrade = 'never')
 ```
 
@@ -89,19 +95,19 @@ The first five columns are required; `replicate` and `sex` are optional.
 [`HMMbehavrFast()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMbehavrFast.md)
 and set `n_cores` to one less than your total CPU core count.
 
-**Fitting has been running for more than 15 minutes:** If you’re already
-using multiple cores, the most likely cause is dead flies in your data —
-the algorithm can get stuck on flat activity traces. Check your data for
-flies that stopped moving partway through the experiment.
+**Fitting has been running for more than 15 minutes:** Check for flat
+activity traces. Use `removeDeadAnimals = TRUE` in
+[`HMMDataPrep()`](https://orijitghosh.github.io/FlyDreamR/reference/HMMDataPrep.md)
+to exclude the suspected death day and later days, then review the
+`QualityReport` for any remaining fit failures.
 
 **Plots look different from the tutorial:** Make sure you have the
 latest versions of `ggplot2` and `patchwork` installed, as their layout
 logic has changed across versions.
 
-**Heatmap hypnograms show greyed-out days:** This means the HMM did not
-converge for those days. Try rerunning with a higher iteration limit. If
-many days are greyed out for the same fly, it probably died during the
-experiment.
+**Heatmap hypnograms show greyed-out days:** Check `QualityReport` for
+the affected fly-days and reasons. A higher iteration limit may help if
+no valid solution was found.
 
 ------------------------------------------------------------------------
 

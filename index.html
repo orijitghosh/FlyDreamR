@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Infer Sleep/Wake States from activity data using hidden Markov models (HMMs) • FlyDreamR</title>
 <script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <meta property="og:title" content="Infer Sleep/Wake States from activity data using hidden Markov models (HMMs)">
@@ -74,15 +74,15 @@
 <p><strong>Infer sleep/wake states from locomotor activity data using hidden Markov models (HMMs).</strong></p>
 </blockquote>
 <p><a href="https://lifecycle.r-lib.org/articles/stages.html" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3-blue.svg" alt="License: GPL-3"></a> <a href="#"><img src="https://img.shields.io/badge/status-active-success" alt="Repo status"></a> <a href="https://github.com/orijitghosh/FlyDreamR/issues" class="external-link"><img src="https://img.shields.io/github/issues/orijitghosh/FlyDreamR.svg" alt="Issues"></a></p>
-<p><strong>FlyDreamR</strong> fits an iterative 4-state hidden Markov model to <em>Drosophila</em> Activity Monitor (DAM) activity counts to classify each minute of recording as sleep or wake. It covers the full pipeline: loading raw monitor files, linking them to metadata, running the HMM (serially or in parallel), and producing summary plots and metrics.</p>
+<p><strong>FlyDreamR</strong> fits an iterative hidden Markov model to <em>Drosophila</em> Activity Monitor (DAM) activity counts. The default is four states; users can also fit three or five activity-ordered states. It covers loading raw monitor files, linking metadata, fitting serially or in parallel, and producing plots and summaries.</p>
 <p>For detailed guides and walkthroughs, visit <a href="https://orijitghosh.github.io/FlyDreamR/" class="uri">https://orijitghosh.github.io/FlyDreamR/</a>.</p>
 <hr>
 <div class="section level2">
 <h2 id="what-it-does">What it does<a class="anchor" aria-label="anchor" href="#what-it-does"></a>
 </h2>
-<p><strong>Data preparation</strong> (<code><a href="reference/HMMDataPrep.html">HMMDataPrep()</a></code>): the first step in the pipeline. Reads raw DAM monitor files, links them to your metadata, and returns a <code>behavr</code> table with day, light/dark phase, and normalized activity calculated and ready for HMM fitting.</p>
+<p><strong>Data preparation</strong> (<code><a href="reference/HMMDataPrep.html">HMMDataPrep()</a></code>): the first step in the pipeline. Reads raw DAM monitor files, links them to your metadata, and returns a <code>behavr</code> table with day, light/dark phase, and normalized activity calculated and ready for HMM fitting. Set <code>removeDeadAnimals = TRUE</code> to remove the day of suspected death and later days.</p>
 <p><strong>Traditional sleep analysis</strong> (<code><a href="reference/calcTradSleep.html">calcTradSleep()</a></code>): define sleep as immobility of 5–60 minutes; returns bout counts, bout lengths, activity index, brief awakenings, and day/phase summaries.</p>
-<p><strong>HMM-based state inference</strong>: fits a per-fly, per-day HMM with configurable emission distributions and Viterbi decoding. Use <code><a href="reference/HMMbehavr.html">HMMbehavr()</a></code> for serial fitting or <code><a href="reference/HMMbehavrFast.html">HMMbehavrFast()</a></code> for parallel fitting across CPU cores.</p>
+<p><strong>HMM-based state inference</strong>: fits a per-fly, per-day Gaussian HMM with Viterbi decoding. Use <code><a href="reference/HMMbehavr.html">HMMbehavr()</a></code> for serial fitting or <code><a href="reference/HMMbehavrFast.html">HMMbehavrFast()</a></code> for parallel fitting across CPU cores. Both accept <code>n_states = 3</code>, <code>4</code>, or <code>5</code> and return a <code>QualityReport</code> with failed fly-days and reasons. Biological state names in the documentation apply to the four-state default.</p>
 <p><strong>Visualization</strong>: heatmap hypnograms (<code><a href="reference/HMMplot.html">HMMplot()</a></code>), faceted group profiles (<code><a href="reference/HMMFacetedPlot.html">HMMFacetedPlot()</a></code>), and single-fly daily profiles (<code><a href="reference/HMMSinglePlot.html">HMMSinglePlot()</a></code>).</p>
 <p><strong>Shiny GUI</strong>: a point-and-click interface for users who prefer not to work in R directly.</p>
 <hr>
@@ -90,8 +90,9 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">'remotes'</span>), repos <span class="ot">=</span> <span class="st">'https://cloud.r-project.org'</span><span class="er">)</span></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">'orijitghosh/FlyDreamR'</span>, <span class="at">upgrade =</span> <span class="st">'never'</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'remotes'</span>, repos <span class="op">=</span> <span class="st">'https://cloud.r-project.org'</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'orijitghosh/FlyDreamR'</span>, upgrade <span class="op">=</span> <span class="st">'never'</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
@@ -154,9 +155,9 @@
 <h2 id="common-issues">Common issues<a class="anchor" aria-label="anchor" href="#common-issues"></a>
 </h2>
 <p><strong>HMM fitting is slow:</strong> Use <code><a href="reference/HMMbehavrFast.html">HMMbehavrFast()</a></code> and set <code>n_cores</code> to one less than your total CPU core count.</p>
-<p><strong>Fitting has been running for more than 15 minutes:</strong> If you’re already using multiple cores, the most likely cause is dead flies in your data — the algorithm can get stuck on flat activity traces. Check your data for flies that stopped moving partway through the experiment.</p>
+<p><strong>Fitting has been running for more than 15 minutes:</strong> Check for flat activity traces. Use <code>removeDeadAnimals = TRUE</code> in <code><a href="reference/HMMDataPrep.html">HMMDataPrep()</a></code> to exclude the suspected death day and later days, then review the <code>QualityReport</code> for any remaining fit failures.</p>
 <p><strong>Plots look different from the tutorial:</strong> Make sure you have the latest versions of <code>ggplot2</code> and <code>patchwork</code> installed, as their layout logic has changed across versions.</p>
-<p><strong>Heatmap hypnograms show greyed-out days:</strong> This means the HMM did not converge for those days. Try rerunning with a higher iteration limit. If many days are greyed out for the same fly, it probably died during the experiment.</p>
+<p><strong>Heatmap hypnograms show greyed-out days:</strong> Check <code>QualityReport</code> for the affected fly-days and reasons. A higher iteration limit may help if no valid solution was found.</p>
 <hr>
 </div>
 <div class="section level2">
@@ -228,7 +229,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

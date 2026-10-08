@@ -15,6 +15,7 @@ you can fit an HMM using:
   (parallel; faster on multi-core machines)
 
 ``` r
+
 # Load demo data
 meta_file <- system.file("extdata", "Metadata_Monitor1.csv", package = "FlyDreamR")
 data_dir <- system.file("extdata", package = "FlyDreamR")
@@ -25,12 +26,22 @@ dt <- HMMDataPrep(
   day_range     = c(1, 2)
 )
 
-# Serial
-res <- HMMbehavr(behavtbl = dt, it = 100, ldcyc = 12)
+# Serial: choose 3, 4, or 5 states (default: 4)
+res <- HMMbehavr(behavtbl = dt, it = 100, ldcyc = 12, n_states = 4)
 
 # Parallel
-res_prl <- HMMbehavrFast(behavtbl = dt, it = 100, ldcyc = 12, n_cores = 4)
+res_prl <- HMMbehavrFast(behavtbl = dt, it = 100, ldcyc = 12,
+                         n_cores = 4, n_states = 4)
+
+# Check any fly-days that could not be fitted
+res$QualityReport
 ```
+
+`QualityReport` has one row per attempted fly-day. Check `status`,
+`reason_code`, and `reason` before interpreting the plots or summaries.
+Failed fly-days do not contribute fitted states. State labels are
+ordered by activity; the biological descriptions used for the original
+four-state model should not be assumed for three- or five-state fits.
 
 ## Plot HMM state profiles
 
@@ -44,6 +55,7 @@ FlyDreamR provides convenient plotting helpers:
   to save individual hypnograms to disk
 
 ``` r
+
 # Heatmap hypnograms
 HMMplot(res)
 
@@ -81,10 +93,12 @@ The HMM results typically include:
 
 - `TimeSpentInEachState` (summaries)
 - `VITERBIDecodedProfile` (decoded state sequences)
+- `QualityReport` (fit status and reason for each fly-day)
 
 You can visualize time spent per state with `ggplot2`:
 
 ``` r
+
 ggplot2::ggplot(res$TimeSpentInEachState,
                 ggplot2::aes(x = state_name, y = time_spent, fill = state_name)) +
   ggplot2::geom_boxplot(width = 0.35, outliers = FALSE) +
