@@ -88,37 +88,30 @@ shinyServer(function(input, output, session) {
     req(input$meta, input$data) # Ensure files are present before calculating
 
     withBusyIndicatorServer("cal", {
-      # File processing moved inside this button observer
-      metadata <- read.csv(input$meta$datapath)
-      metadata <- na.omit(metadata)
-
-      fixUploadedFilesNames <- function(x) {
-        if (is.null(x)) {
-          return()
-        }
-        oldNames <- x$datapath
-        newNames <- file.path(dirname(x$datapath), x$name)
-        file.rename(from = oldNames, to = newNames)
-        x$datapath <- newNames
-        x
-      }
-
-      file.copy(fixUploadedFilesNames(input$data)$datapath, ".", recursive = TRUE, overwrite = TRUE)
-      metadata_proc <- link_dam_metadata(metadata, result_dir = ".")
+      upload_dir <- file.path(tempdir(), paste0("FlyDreamR-", session$token))
+      stageUploadedDamFiles(input$data, upload_dir)
 
       # Heavy calculations
       dt_curated_calc <- HMMDataPrep(
         metafile_path = input$meta$datapath,
-        result_dir = ".", ldcyc = input$light, day_range = c(input$start, input$end)
+        result_dir = upload_dir, ldcyc = input$light, day_range = c(input$start, input$end),
+        removeDeadAnimals = isTRUE(input$remove_dead)
       )
       res1_calc <- HMMbehavrFast(
         behavtbl = dt_curated_calc, it = input$itr,
-        n_cores = input$nCrs, ldcyc = input$light
+        n_cores = input$nCrs, ldcyc = input$light,
+        n_states = as.integer(input$n_states)
       )
+      if (!is.list(res1_calc) || is.null(res1_calc$QualityReport)) {
+        stop("HMM fitting did not return a quality report.", call. = FALSE)
+      }
 
       # Store the results in our reactiveValues object
       results$dt_curated <- dt_curated_calc
       results$res1 <- res1_calc
+      if (!any(res1_calc$QualityReport$status == "ok")) {
+        stop("No fly/day produced a valid fit. Review the QualityReport below.", call. = FALSE)
+      }
     })
   })
 
@@ -187,6 +180,11 @@ shinyServer(function(input, output, session) {
     results$res1$VITERBIDecodedProfile
   }, filter = list(position = "top", clear = FALSE, plain = TRUE))
 
+  output$qualityTbl <- DT::renderDataTable({
+    req(results$res1)
+    results$res1$QualityReport
+  }, filter = list(position = "top", clear = FALSE, plain = TRUE))
+
   # Download Handlers
   output$downloadData_tmspntTbl <- downloadHandler(
     filename = function() {
@@ -207,6 +205,14 @@ shinyServer(function(input, output, session) {
       req(results$res1) # Require results$res1 to exist
       write.csv(results$res1$VITERBIDecodedProfile,
                 file, row.names = FALSE, quote = FALSE)
+    }
+  )
+
+  output$downloadQuality <- downloadHandler(
+    filename = function() "QualityReport.csv",
+    content = function(file) {
+      req(results$res1)
+      write.csv(results$res1$QualityReport, file, row.names = FALSE, quote = FALSE)
     }
   )
 })

@@ -27,7 +27,8 @@ state names found in the data. Format:
 \code{c("State0" = "#RRGGBB", "State1" = "#RRGGBB", ...)}
 
 If \code{color_palette = "user"} but this parameter is \code{NULL} or
-incomplete, an error will be raised.}
+incomplete, an error will be raised.
+For three- or five-state fits, provide one color per fitted state.}
 }
 \value{
 A \code{ggplot2} object showing:
@@ -63,6 +64,8 @@ All palettes follow the same principle: warm colors = wake, cool colors = sleep
 \item State2: #33c5e8 (cyan, light sleep)
 \item State3: #004a73 (navy, deep sleep)
 }
+These descriptions are for the four-state default. Three- and five-state
+palettes are interpolated from these colors.
 
 \strong{"AG" palette:}
 \itemize{

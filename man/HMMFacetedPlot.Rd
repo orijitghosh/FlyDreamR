@@ -14,7 +14,8 @@ must be a data frame containing the \code{VITERBIDecodedProfile} with columns:
 \item \code{ID}: Individual identifier
 \item \code{day}: Day number
 \item \code{timestamp}: Time point index (1 to 1440 for minute resolution)
-\item \code{state_name}: State label (State0, State1, State2, State3)
+\item \code{state_name}: State label (State0 to State2, State3, or State4,
+depending on the fitted state count)
 \item \code{genotype}: Genotype identifier
 }}
 
@@ -30,7 +31,7 @@ Default: \code{"default"}.}
 A \code{ggplot2} object displaying a faceted plot with:
 \itemize{
 \item \strong{X-axis}: Time in hours (0-24)
-\item \strong{Y-axis}: State names (State0 through State3)
+\item \strong{Y-axis}: Fitted state names
 \item \strong{Facets}: One panel per individual-day combination, arranged in
 a grid. Facet labels show ID and "Day: N"
 \item \strong{Colors}: States colored by activity level (warm = active, cool = sleep)
@@ -61,6 +62,8 @@ sleep/wake patterns.
 \item State2 (light sleep): #33c5e8 (light blue)
 \item State3 (deep sleep): #004a73 (dark blue)
 }
+These descriptions are for the four-state default. Three- and five-state
+palettes are interpolated from these colors.
 
 \strong{AG palette:}
 \itemize{

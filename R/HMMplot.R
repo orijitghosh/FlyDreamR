@@ -29,6 +29,7 @@
 #'
 #'   If \code{color_palette = "user"} but this parameter is \code{NULL} or
 #'   incomplete, an error will be raised.
+#'   For three- or five-state fits, provide one color per fitted state.
 #'
 #' @return A \code{ggplot2} object showing:
 #'   \itemize{
@@ -52,6 +53,8 @@
 #'   \item State2: #33c5e8 (cyan, light sleep)
 #'   \item State3: #004a73 (navy, deep sleep)
 #' }
+#' These descriptions are for the four-state default. Three- and five-state
+#' palettes are interpolated from these colors.
 #'
 #' **"AG" palette:**
 #' \itemize{
@@ -126,26 +129,13 @@ HMMplot <- function(hmm_inference_list, color_palette = "default", user_colors =
   # Extract the data frame containing state information
   state_data <- hmm_inference_list[[2]]
   state_names <- unique(state_data$state_name)
-
-  # Define default color palettes
-  default_colors <- c(
-    "State0" = "#f75c46",
-    "State1" = "#ffa037",
-    "State2" = "#33c5e8",
-    "State3" = "#004a73"
-  )
-
-  AG_colors <- c(
-    "State0" = "#fb8500",
-    "State1" = "#ffb703",
-    "State2" = "#8ecae6",
-    "State3" = "#219ebc"
-  )
+  n_states <- if (!is.null(hmm_inference_list$QualityReport))
+    hmm_inference_list$QualityReport$n_states[1] else NULL
 
   # Select the color palette based on the input
   selected_colors <- switch(color_palette,
-    "default" = default_colors,
-    "AG" = AG_colors,
+    "default" = hmm_state_colors(state_names, "default", n_states),
+    "AG" = hmm_state_colors(state_names, "AG", n_states),
     "user" = {
       if (is.null(user_colors) || !is.character(user_colors) || is.null(names(user_colors)) ||
         !all(state_names %in% names(user_colors))) {

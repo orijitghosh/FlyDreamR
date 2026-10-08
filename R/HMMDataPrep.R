@@ -27,6 +27,8 @@
 #'     \item Use \code{c(1, 5)} to keep days 1 through 5
 #'   }
 #'   Default: \code{c(1, 2)} (first two days).
+#' @param removeDeadAnimals Remove the day on which sustained low activity begins
+#'   and later days for each animal. Default: \code{FALSE}.
 #' @param ... Additional arguments passed to \code{\link{sleepDAMAnnotation}}.
 #'   Most commonly used:
 #'   \describe{
@@ -141,7 +143,8 @@ HMMDataPrep <- function(metafile_path,
                         result_dir = getwd(),
                         ldcyc = 12,
                         day_range = c(1, 2),
-                        ...) {
+                        ...,
+                        removeDeadAnimals = FALSE) {
   # --- 1. Input Validation and Setup ---
   # Check required packages silently, stop if missing
   pkgs <- c("data.table", "damr", "behavr", "cli")
@@ -167,6 +170,9 @@ HMMDataPrep <- function(metafile_path,
   }
   if (!is.numeric(day_range) || length(day_range) != 2 || any(!is.finite(day_range)) || day_range[1] < 1 || day_range[2] < day_range[1]) {
     stop("`day_range` must be a numeric vector of length 2 (start_day, end_day), with start_day >= 1 and end_day >= start_day.")
+  }
+  if (!is.logical(removeDeadAnimals) || length(removeDeadAnimals) != 1 || is.na(removeDeadAnimals)) {
+    stop("`removeDeadAnimals` must be TRUE or FALSE.", call. = FALSE)
   }
   day_range <- floor(day_range) # Ensure integer days
 
@@ -256,6 +262,14 @@ HMMDataPrep <- function(metafile_path,
   dt[, phase := ifelse(t %% behavr::hours(24) >= behavr::hours(ldcyc), "Dark", "Light")]
   # Ensure consistent factor levels
   dt[, phase := factor(phase, levels = c("Light", "Dark"))]
+
+  if (removeDeadAnimals) {
+    before <- unique(dt[, .(id, day)])
+    dt <- curate_dead(dt)
+    removed <- nrow(before) - nrow(unique(dt[, .(id, day)]))
+    cli::cli_alert_info("Dead-animal curation removed {removed} individual-day(s).")
+    if (nrow(dt) == 0) stop("No data remains after dead-animal curation.", call. = FALSE)
+  }
 
   # --- 9. Filter by Day Range ---
   initial_rows_filter <- nrow(dt)

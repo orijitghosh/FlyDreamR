@@ -1,5 +1,11 @@
 # FlyDreamR 1.0.0
 
+## Data preparation and HMM analysis
+
+-   Added optional suspected dead-fly removal in `HMMDataPrep()`.
+-   Added 3- and 5-state HMM fitting alongside the four-state default.
+-   Added a per-fly-day `QualityReport` and clearer fit errors in console and Shiny workflows.
+
 ## New Features
 
 -   Added parallelized HMM fitting with `HMMbehavrFast()`

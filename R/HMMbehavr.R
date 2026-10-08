@@ -2,12 +2,10 @@
 #'
 #' @description
 #' Applies a Hidden Markov Model (HMM) to behavioral activity data to infer
-#' discrete sleep/wake states. The model identifies four behavioral states
-#' (State0-State3) ordered by activity level, where State0 represents the
-#' highest activity (active wake) and State3 represents the lowest activity
-#' (deep sleep).
+#' discrete sleep/wake states. States are ordered by activity level, with
+#' State0 representing the highest activity. Four states remain the default.
 #'
-#' The function fits an HMM with 4 states using Gaussian emission distributions
+#' The function fits an HMM with Gaussian emission distributions
 #' for normalized activity levels. Multiple iterations are performed for each
 #' individual and day to ensure robust state inference, with the most frequently
 #' inferred state at each time point selected as the final classification.
@@ -28,8 +26,9 @@
 #' @param ldcyc Numeric value specifying the light phase duration in hours
 #'   (e.g., 12 for LD 12:12). If \code{NULL} (default), assumes a 12-hour
 #'   light phase. Used to assign "light" and "dark" phase labels to time points.
+#' @param n_states Number of states to fit: 3, 4, or 5. Default: 4.
 #'
-#' @return A list containing two data frames:
+#' @return A list containing three data frames:
 #'   \describe{
 #'     \item{\code{TimeSpentInEachState}}{Summary of time (in minutes) spent in
 #'       each state, grouped by:
@@ -38,7 +37,8 @@
 #'         \item \code{Genotype}: Genotype
 #'         \item \code{day}: Day number
 #'         \item \code{phase}: Light or dark phase
-#'         \item \code{state_name}: State0, State1, State2, or State3
+#'         \item \code{state_name}: Activity-ordered state label (State0 to
+#'           State2, State3, or State4, depending on the fitted state count)
 #'         \item \code{time_spent}: Minutes in that state
 #'         \item Additional metadata columns (e.g., \code{sex}, \code{treatment})
 #'       }
@@ -48,12 +48,15 @@
 #'       \itemize{
 #'         \item \code{timestamp}: Time point index (1 to total time points)
 #'         \item \code{state}: Raw HMM state label
-#'         \item \code{state_name}: Activity-ordered state name (State0-State3)
+#'         \item \code{state_name}: Activity-ordered state label (State0 to
+#'           State2, State3, or State4, depending on the fitted state count)
 #'         \item \code{phase}: Light or dark
 #'         \item \code{ID}, \code{Genotype}, \code{day}: Grouping variables
 #'         \item Additional metadata columns (e.g., \code{sex}, \code{treatment})
 #'       }
 #'     }
+#'     \item{\code{QualityReport}}{One row per attempted individual and day,
+#'       with the requested state count, valid fits, status, and reason.}
 #'   }
 #'
 #' @details
@@ -65,6 +68,8 @@
 #'   \item \strong{State2}: Low activity (light sleep)
 #'   \item \strong{State3}: Lowest activity (deep sleep)
 #' }
+#' These biological labels apply to the default four-state model. With three
+#' or five states, labels indicate activity order only.
 #'
 #' ## Failed Cases
 #' The function tracks cases where HMM fitting fails or produces invalid results:
@@ -73,7 +78,8 @@
 #'   \item Single-state dominance (>99% of time in one state) - indicates
 #'     insufficient behavioral variability
 #' }
-#' Failed cases are printed to console and excluded from results.
+#' Failed cases are recorded in \code{QualityReport} and excluded from state
+#' summaries. Unexpected top-level errors stop the call.
 #'
 #' ## Performance Notes
 #' - Progress bar shows overall fitting progress
@@ -116,7 +122,7 @@
 #' heterogeneity in sleep states. (Add actual reference when published)
 #'
 #' @export
-HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
+HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL, n_states = 4L) {
   # validate + clamp iterations
   if (!(is.numeric(it) && length(it) == 1L && is.finite(it) && it == as.integer(it))) {
     stop("'it' must be a single integer.", call. = FALSE)
@@ -129,6 +135,10 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
     }
     it <- 100L
   }
+  if (!(is.numeric(n_states) && length(n_states) == 1L && n_states %in% 3:5)) {
+    stop("'n_states' must be 3, 4, or 5.", call. = FALSE)
+  }
+  n_states <- as.integer(n_states)
 
   tryCatch(
     {
@@ -138,8 +148,9 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
       time_spent_all_states <- data.frame()
       profile_all_states <- data.frame()
       transitions_all_states <- data.frame()
-      # This data frame will now correctly store all failed cases
-      failed_cases <<- data.frame(ID = character(), Day = numeric(), ErrorMessage = character(), stringsAsFactors = FALSE)
+      quality_report <- data.frame(ID = character(), day = numeric(), n_states = integer(),
+                                   n_valid = integer(), status = character(), reason_code = character(),
+                                   reason = character(), stringsAsFactors = FALSE)
 
       dt_hmm <- behavtbl
 
@@ -164,12 +175,25 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
       for (individual_id in unique(dt_hmm$id)) {
         # Iterate through each unique day
         for (day_number in unique(dt_hmm$day)) {
+          dt_individual_day <- dt_hmm %>% dplyr::filter(id == individual_id & day == day_number)
+          if (nrow(dt_individual_day) == 0) next
+          if (!any(is.finite(dt_individual_day$normact) & dt_individual_day$normact > 0)) {
+            quality_report <- rbind(quality_report, data.frame(ID = as.character(individual_id),
+              day = day_number, n_states = n_states, n_valid = 0L, status = "failed",
+              reason_code = "all_zero", reason = "No positive normalized activity."))
+            next
+          }
+          if (nrow(dt_individual_day) < 2 * n_states) {
+            quality_report <- rbind(quality_report, data.frame(ID = as.character(individual_id),
+              day = day_number, n_states = n_states, n_valid = 0L, status = "failed",
+              reason_code = "too_few_bins", reason = "Too few time bins for the requested states."))
+            next
+          }
           tryCatch(
             {
               # Filter data for the current individual and day
-              dt_individual_day <- dt_hmm %>% dplyr::filter(id == individual_id & day == day_number)
               dt_processed <- dt_individual_day
-              k <- 4
+              k <- n_states
 
               # Prepare data for HMM: select time and normalized activity
               hmm_data <- as.data.frame(dt_processed[, c("t", "normact")])
@@ -322,7 +346,8 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
                 } # End of repeat loop
 
                 # If a valid solution was found in the inner loop, add it to the collection
-                if (exists("iteration_results", inherits = FALSE)) {
+                if (exists("iteration_results", inherits = FALSE) &&
+                    length(unique(iteration_results[[1]]$state_name)) == k) {
                   iteration_results[[2]]$ID <- individual_id
                   iteration_results[[2]]$day <- day_number
                   iteration_results[[2]]$iter <- iteration
@@ -359,15 +384,10 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
                   )
                   cli::cli_alert_warning(msg)
 
-                  failed_cases <<- rbind(
-                    failed_cases,
-                    data.frame(
-                      ID = individual_id,
-                      Day = day_number,
-                      ErrorMessage = "Excluded: >99% of 1440 minutes in one state",
-                      stringsAsFactors = FALSE
-                    )
-                  )
+                  quality_report <- rbind(quality_report, data.frame(ID = as.character(individual_id),
+                    day = day_number, n_states = n_states,
+                    n_valid = length(unique(profile_iterations$iter)), status = "failed",
+                    reason_code = "single_state_dominance", reason = msg))
 
                   # Skip adding this day's results to the final data frames
                   next
@@ -381,14 +401,16 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
                   dplyr::group_by(state_name, phase, ID, day) %>%
                   dplyr::summarise(time_spent = dplyr::n() * 1, .groups = "drop")
                 time_spent_all_states <- rbind(time_spent_all_states, time_spent_summary)
+                quality_report <- rbind(quality_report, data.frame(ID = as.character(individual_id),
+                  day = day_number, n_states = n_states,
+                  n_valid = length(unique(profile_iterations$iter)), status = "ok",
+                  reason_code = "ok", reason = ""))
               } else {
                 # If profile_iterations is empty, it means NO iteration succeeded. Log it as a failed case.
-                failed_cases <<- rbind(failed_cases, data.frame(
-                  ID = individual_id,
-                  Day = day_number,
-                  ErrorMessage = paste("No valid solution found after", it, "iterations."),
-                  stringsAsFactors = FALSE
-                ))
+                quality_report <- rbind(quality_report, data.frame(ID = as.character(individual_id),
+                  day = day_number, n_states = n_states, n_valid = 0L, status = "failed",
+                  reason_code = "no_valid_solution", reason = paste0("No valid ", n_states,
+                    "-state solution after ", it, " iterations.")))
               }
             },
             error = function(e) {
@@ -396,26 +418,25 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
               cli::cli_alert_danger(
                 cli::style_bold(cli::col_red("Error processing ID:", individual_id, "Day:", day_number, " - ", e$message))
               )
-              failed_cases <<- rbind(failed_cases, data.frame(
-                ID = individual_id,
-                Day = day_number,
-                ErrorMessage = e$message,
-                stringsAsFactors = FALSE
-              ))
+              quality_report <<- rbind(quality_report, data.frame(ID = as.character(individual_id),
+                day = day_number, n_states = n_states, n_valid = 0L, status = "failed",
+                reason_code = "processing_error", reason = conditionMessage(e)))
             }
           ) # End of inner tryCatch
         } # End of day loop
       } # End of individual loop
 
       # Ensure all state-phase combinations are present in the time spent data
-      time_spent_all_states <- time_spent_all_states %>%
-        dplyr::group_by(ID, day) %>%
-        tidyr::complete(
-          phase = c("light", "dark"),
-          state_name = c("State0", "State1", "State2", "State3"),
-          fill = list(time_spent = 0)
-        ) %>%
-        dplyr::ungroup()
+      if (nrow(time_spent_all_states) > 0) {
+        time_spent_all_states <- time_spent_all_states %>%
+          dplyr::group_by(ID, day) %>%
+          tidyr::complete(
+            phase = c("light", "dark"),
+            state_name = paste0("State", seq_len(n_states) - 1L),
+            fill = list(time_spent = 0)
+          ) %>%
+          dplyr::ungroup()
+      }
 
       # Join metadata back to results
       if (nrow(time_spent_all_states) > 0) {
@@ -430,22 +451,20 @@ HMMbehavr <- function(behavtbl, it = 100, ldcyc = NULL) {
 
       tictoc::toc()
 
-      # This final check will now correctly display all collected errors.
-      if (nrow(failed_cases) > 0) {
-        cli::cli_alert_warning("The following IDs and Days failed to produce a valid HMM solution and were excluded:")
-        print(failed_cases)
+      if (any(quality_report$status == "failed")) {
+        cli::cli_alert_warning("{sum(quality_report$status == 'failed')} fly-day(s) failed; see QualityReport for reasons.")
       }
 
       # Return the results as a list of data frames
       return(list(
-        TimeSpentInEachState = time_spent_all_states %>% dplyr::select(-c(file_info, experiment_id)),
-        VITERBIDecodedProfile = profile_all_states %>% dplyr::select(-c(file_info, experiment_id))
+        TimeSpentInEachState = time_spent_all_states %>% dplyr::select(-dplyr::any_of(c("file_info", "experiment_id"))),
+        VITERBIDecodedProfile = profile_all_states %>% dplyr::select(-dplyr::any_of(c("file_info", "experiment_id"))),
+        QualityReport = quality_report
       ))
     },
     error = function(e) {
       # This is a catch-all for any other unexpected error in the function.
-      cli::cli_alert_danger(paste("A critical error occurred:", e$message))
-      return(NULL)
+      stop(e)
     }
   ) # End of outer tryCatch
 }

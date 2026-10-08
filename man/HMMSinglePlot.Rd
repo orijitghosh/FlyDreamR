@@ -44,13 +44,17 @@ Plots are saved with the following structure:
       ├── [ID]_day2_4states.png
       └── ...
 }
+The examples above use the four-state default; three- and five-state fits
+use their fitted state count in the file name.
+}
 
-## File Naming
-Each file is named: \code{[ID]_day[N]_4states.png}
+\subsection{File Naming}{
+
+Each file is named: \code{[ID]_day[N]_[K]states.png}
 \itemize{
 \item ID is sanitized (timestamps and pipe characters removed)
 \item Day number is appended
-\item Suffix "_4states" indicates 4-state HMM
+\item Suffix gives the number of fitted states (3, 4, or 5)
 }
 }
 

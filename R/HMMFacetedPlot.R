@@ -17,7 +17,8 @@
 #'     \item \code{ID}: Individual identifier
 #'     \item \code{day}: Day number
 #'     \item \code{timestamp}: Time point index (1 to 1440 for minute resolution)
-#'     \item \code{state_name}: State label (State0, State1, State2, State3)
+#'     \item \code{state_name}: State label (State0 to State2, State3, or State4,
+#'       depending on the fitted state count)
 #'     \item \code{genotype}: Genotype identifier
 #'   }
 #' @param col_palette Character string specifying the color palette. Options:
@@ -31,7 +32,7 @@
 #' @return A \code{ggplot2} object displaying a faceted plot with:
 #'   \itemize{
 #'     \item **X-axis**: Time in hours (0-24)
-#'     \item **Y-axis**: State names (State0 through State3)
+#'     \item **Y-axis**: Fitted state names
 #'     \item **Facets**: One panel per individual-day combination, arranged in
 #'       a grid. Facet labels show ID and "Day: N"
 #'     \item **Colors**: States colored by activity level (warm = active, cool = sleep)
@@ -51,6 +52,8 @@
 #'   \item State2 (light sleep): #33c5e8 (light blue)
 #'   \item State3 (deep sleep): #004a73 (dark blue)
 #' }
+#' These descriptions are for the four-state default. Three- and five-state
+#' palettes are interpolated from these colors.
 #'
 #' **AG palette:**
 #' \itemize{
@@ -105,6 +108,7 @@
 #' \code{\link{HMMbehavr}} for generating input data
 #'
 #' @export
+#' @import ggplot2
 HMMFacetedPlot <- function(HMMinferList, col_palette = "default") {
   # Basic validation of input
   if (is.null(HMMinferList) || length(HMMinferList) < 2 || !is.data.frame(HMMinferList[[2]])) {
@@ -171,12 +175,9 @@ HMMFacetedPlot <- function(HMMinferList, col_palette = "default") {
   }
 
   combined_plot_data <- dplyr::bind_rows(all_plot_data_list)
-
-  my_colors <- if (col_palette == "AG") {
-    c("State0" = "#fb8500", "State1" = "#ffb703", "State2" = "#8ecae6", "State3" = "#219ebc")
-  } else {
-    c("State0" = "#f75c46", "State1" = "#ffa037", "State2" = "#33c5e8", "State3" = "#004a73")
-  }
+  n_states <- if (!is.null(HMMinferList$QualityReport))
+    HMMinferList$QualityReport$n_states[1] else NULL
+  my_colors <- hmm_state_colors(combined_plot_data$state_name, col_palette, n_states)
 
   unique_states_in_data <- unique(combined_plot_data$state_name)
   missing_from_palette <- setdiff(unique_states_in_data, names(my_colors))
@@ -191,7 +192,8 @@ HMMFacetedPlot <- function(HMMinferList, col_palette = "default") {
   y_axis_labels_present <- sort(intersect(unique_states_in_data, names(my_colors)))
   numeric_part_for_labels <- suppressWarnings(as.numeric(gsub("State", "", y_axis_labels_present)))
   valid_numeric_part <- !is.na(numeric_part_for_labels)
-  y_axis_breaks <- numeric_part_for_labels[valid_numeric_part] / 3
+  state_denominator <- length(my_colors) - 1L
+  y_axis_breaks <- numeric_part_for_labels[valid_numeric_part] / state_denominator
   y_axis_labels_filtered <- y_axis_labels_present[valid_numeric_part]
   min_y_lim <- if (length(y_axis_breaks) > 0 && any(!is.na(y_axis_breaks))) min(0, min(y_axis_breaks, na.rm = TRUE)) else 0
   max_y_lim <- if (length(y_axis_breaks) > 0 && any(!is.na(y_axis_breaks))) max(1, max(y_axis_breaks, na.rm = TRUE)) else 1
@@ -209,7 +211,7 @@ HMMFacetedPlot <- function(HMMinferList, col_palette = "default") {
     return(labels)
   }
 
-  p_faceted <- ggplot(combined_plot_data, aes(x = (timestamp / 60), y = State / 3)) +
+  p_faceted <- ggplot(combined_plot_data, aes(x = (timestamp / 60), y = State / state_denominator)) +
     geom_line(color = "black", linewidth = 0.5, alpha = 0.1) +
     geom_point(aes(color = state_name), size = 1.5, alpha = 1, stroke = 0.5, shape = 124) +
     scale_color_manual(values = my_colors, name = "State name") +

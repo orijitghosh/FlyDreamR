@@ -34,13 +34,15 @@
 #'       ├── [ID]_day2_4states.png
 #'       └── ...
 #' }
+#' The examples above use the four-state default; three- and five-state fits
+#' use their fitted state count in the file name.
 #'
 #' ## File Naming
-#' Each file is named: \code{[ID]_day[N]_4states.png}
+#' Each file is named: \code{[ID]_day[N]_[K]states.png}
 #' \itemize{
 #'   \item ID is sanitized (timestamps and pipe characters removed)
 #'   \item Day number is appended
-#'   \item Suffix "_4states" indicates 4-state HMM
+#'   \item Suffix gives the number of fitted states (3, 4, or 5)
 #' }
 #'
 #' ## Directory Creation
@@ -105,8 +107,13 @@
 #' \code{\link{HMMbehavr}} for generating input data
 #'
 #' @export
+#' @import ggplot2
 HMMSinglePlot <- function(HMMinferList, col_palette = "default") {
   uniq <- unique(HMMinferList[[2]]$ID)
+  n_states <- if (!is.null(HMMinferList$QualityReport))
+    HMMinferList$QualityReport$n_states[1] else
+    max(as.integer(sub("State", "", HMMinferList[[2]]$state_name)), na.rm = TRUE) + 1L
+  colors <- hmm_state_colors(HMMinferList[[2]]$state_name, col_palette, n_states)
   for (i in 1:length(uniq)) {
     loopid <- uniq[i]
     for (j in min(HMMinferList[[2]]$day):max(HMMinferList[[2]]$day)) {
@@ -130,11 +137,11 @@ HMMSinglePlot <- function(HMMinferList, col_palette = "default") {
       )
       p1 <- ggplot() +
         geom_line(probs_plot,
-                  mapping = aes(x = (timestamp / 60), y = as.numeric(State) / 3),
+                  mapping = aes(x = (timestamp / 60), y = as.numeric(State) / (n_states - 1L)),
                   color = "black", size = 0.5, alpha = 0.1
         ) +
         geom_point(probs_plot,
-                   mapping = aes(x = (timestamp / 60), y = as.numeric(State) / 3, color = state_name),
+                   mapping = aes(x = (timestamp / 60), y = as.numeric(State) / (n_states - 1L), color = state_name),
                    size = 4, alpha = 1, stroke = 0.5, shape = 124
         ) +
         guides(color = guide_legend(
@@ -143,27 +150,11 @@ HMMSinglePlot <- function(HMMinferList, col_palette = "default") {
         theme_minimal() +
         xlab("Time (hours)") +
         ylab(NULL) +
-        (if (col_palette == "AG") {
-          scale_color_manual(
-            values = c(
-              "State0" = "#fb8500",
-              "State1" = "#ffb703",
-              "State2" = "#8ecae6",
-              "State3" = "#219ebc"
-            )
-          )
-        } else {
-          scale_color_manual(
-            values = c(
-              "State0" = "#f75c46",
-              "State1" = "#ffa037",
-              "State2" = "#33c5e8",
-              "State3" = "#004a73"
-            )
-          )
-        }) +
+        scale_color_manual(values = colors) +
         scale_x_continuous(breaks = seq(0, 24, 4)) +
-        scale_y_continuous(breaks = seq(0, 1, 0.33), labels = c("State0", "State1", "State2", "State3")) +
+        scale_y_continuous(breaks = if (n_states == 4L) seq(0, 1, 0.33) else
+                             (0:(n_states - 1L)) / (n_states - 1L),
+                           labels = paste0("State", 0:(n_states - 1L))) +
         theme(
           axis.text = element_text(size = 10, color = "black"), aspect.ratio = 0.15, panel.grid = element_blank(),
           axis.title = element_text(size = 12, face = "bold", color = "black"), legend.position = "none",
@@ -177,7 +168,7 @@ HMMSinglePlot <- function(HMMinferList, col_palette = "default") {
         coord_cartesian(xlim = c(0, 24), ylim = c(0, 1), clip = "off") +
         annotate("segment", x = 0.0, xend = 24.01, y = -0.25, yend = -0.25, size = 4, color = "black") +
         annotate("segment", x = 0.0 + 0.01, xend = 24.01 - 12.01, y = -0.25, yend = -0.25, size = 3, color = "white")
-      loop_filename <- paste0("./profiles_all/", unique(df_loop$genotype), "/", loopid, "_day", loopday, "_4states.png")
+      loop_filename <- paste0("./profiles_all/", unique(df_loop$genotype), "/", loopid, "_day", loopday, "_", n_states, "states.png")
       loop_filename <- gsub(":", "_", loop_filename)
       pattern_to_remove <- "\\d{4}-\\d{2}-\\d{2} \\d{2}_\\d{2}_\\d{2}\\|.*\\.txt\\|"
       loop_filename <- sub(pattern_to_remove, "", loop_filename)

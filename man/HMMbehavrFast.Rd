@@ -4,7 +4,7 @@
 \alias{HMMbehavrFast}
 \title{Parallel Hidden Markov Model for Sleep State Inference}
 \usage{
-HMMbehavrFast(behavtbl, it = 100, n_cores = 4, ldcyc = NULL)
+HMMbehavrFast(behavtbl, it = 100, n_cores = 4, ldcyc = NULL, n_states = 4L)
 }
 \arguments{
 \item{behavtbl}{A \code{behavr} table containing behavioral data for multiple
@@ -26,13 +26,16 @@ processing. Default: 4.
 
 \item{ldcyc}{Numeric specifying light phase duration in hours. If \code{NULL}
 (default), assumes 12-hour light phase. See \code{\link{HMMbehavr}} for details.}
+
+\item{n_states}{Number of states to fit: 3, 4, or 5. Default: 4.}
 }
 \value{
-A list containing two data frames with combined results from all
+A list containing three data frames with combined results from all
 individuals:
 \describe{
 \item{\code{TimeSpentInEachState}}{Time spent in each state for all individuals}
 \item{\code{VITERBIDecodedProfile}}{HMM-inferred state profiles for all individuals}
+\item{\code{QualityReport}}{Fit status and reason for each individual and day}
 }
 
 See \code{\link{HMMbehavr}} for detailed description of output structure.
@@ -82,8 +85,8 @@ For 32 individuals, 3 days each, it=100:
 
 \subsection{Error Handling}{
 
-If any individual fails to process, that individual returns \code{NULL} and
-is excluded from the final results. Other individuals continue processing normally.
+Failed individual-days are recorded in \code{QualityReport}. Unexpected
+worker errors stop the call.
 }
 }
 \examples{

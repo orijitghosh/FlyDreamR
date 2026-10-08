@@ -26,12 +26,14 @@
 #'   }
 #' @param ldcyc Numeric specifying light phase duration in hours. If \code{NULL}
 #'   (default), assumes 12-hour light phase. See \code{\link{HMMbehavr}} for details.
+#' @param n_states Number of states to fit: 3, 4, or 5. Default: 4.
 #'
-#' @return A list containing two data frames with combined results from all
+#' @return A list containing three data frames with combined results from all
 #'   individuals:
 #'   \describe{
 #'     \item{\code{TimeSpentInEachState}}{Time spent in each state for all individuals}
 #'     \item{\code{VITERBIDecodedProfile}}{HMM-inferred state profiles for all individuals}
+#'     \item{\code{QualityReport}}{Fit status and reason for each individual and day}
 #'   }
 #'
 #'   See \code{\link{HMMbehavr}} for detailed description of output structure.
@@ -63,8 +65,8 @@
 #' }
 #'
 #' ## Error Handling
-#' If any individual fails to process, that individual returns \code{NULL} and
-#' is excluded from the final results. Other individuals continue processing normally.
+#' Failed individual-days are recorded in \code{QualityReport}. Unexpected
+#' worker errors stop the call.
 #'
 #' @examples
 #' \dontrun{
@@ -106,9 +108,16 @@
 HMMbehavrFast <- function(behavtbl,
                           it = 100,
                           n_cores = 4,
-                          ldcyc = NULL) {
+                          ldcyc = NULL,
+                          n_states = 4L) {
   # ---- small validation ----
-  if (!is.numeric(n_cores) || n_cores <= 0 || n_cores != round(n_cores)) stop("'n_cores' must be a positive integer.")
+  if (!(is.numeric(n_cores) && length(n_cores) == 1L && is.finite(n_cores) &&
+        n_cores > 0 && n_cores == as.integer(n_cores))) {
+    stop("'n_cores' must be a positive integer.", call. = FALSE)
+  }
+  if (!(is.numeric(n_states) && length(n_states) == 1L && n_states %in% 3:5)) {
+    stop("'n_states' must be 3, 4, or 5.", call. = FALSE)
+  }
 
   # make %dopar% available without attaching packages
   `%dopar%` <- foreach::`%dopar%`
@@ -122,14 +131,15 @@ HMMbehavrFast <- function(behavtbl,
   doParallel::registerDoParallel(cl)
 
   # local helper; will be exported to workers
-  process_individual <- function(individual_id, behavtbl, it, ldcyc) {
+  process_individual <- function(individual_id, behavtbl, it, ldcyc, n_states) {
     dat <- behavtbl[behavtbl$id == individual_id, ]
 
     # IMPORTANT: avoid progress bars/noisy printing in workers
     FlyDreamR::HMMbehavr(
       behavtbl = dat,
       it = it,
-      ldcyc = ldcyc
+      ldcyc = ldcyc,
+      n_states = n_states
     )
   }
 
@@ -143,7 +153,10 @@ HMMbehavrFast <- function(behavtbl,
     # .export   = c("process_individual") # not really needed, let future auto export
     # .errorhandling = "pass"   # uncomment to collect errors instead of stopping
   ) %dopar% {
-    out <- process_individual(individual_id, behavtbl, it, ldcyc)
+    out <- tryCatch(
+      process_individual(individual_id, behavtbl, it, ldcyc, n_states),
+      error = function(e) stop("ID ", individual_id, ": ", conditionMessage(e), call. = FALSE)
+    )
     list(out)
   }
 
@@ -155,13 +168,16 @@ HMMbehavrFast <- function(behavtbl,
   # Safely extract the two dfs by NAME and coerce to plain data.frame
   get_ts <- function(x) as.data.frame(x[["TimeSpentInEachState"]])
   get_vb <- function(x) as.data.frame(x[["VITERBIDecodedProfile"]])
+  get_qr <- function(x) as.data.frame(x[["QualityReport"]])
 
   # Use data.table::rbindlist (fast, tolerant) or dplyr::bind_rows
   time_spent_in_states <- data.table::rbindlist(lapply(res_list, get_ts), use.names = TRUE, fill = TRUE)
   hmm_sleep_profiles <- data.table::rbindlist(lapply(res_list, get_vb), use.names = TRUE, fill = TRUE)
+  quality_report <- data.table::rbindlist(lapply(res_list, get_qr), use.names = TRUE, fill = TRUE)
 
   return(list(
     TimeSpentInEachState = time_spent_in_states,
-    VITERBIDecodedProfile = hmm_sleep_profiles
+    VITERBIDecodedProfile = hmm_sleep_profiles,
+    QualityReport = quality_report
   ))
 }

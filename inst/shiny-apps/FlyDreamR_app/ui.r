@@ -107,6 +107,8 @@ navbarPage(
           type = "inline", title = "Ending day",
           content = "Subset your data. For an 8-day experiment, the last day is day 7."
         ),
+        checkboxInput("remove_dead", "Remove suspected death day and later days", FALSE),
+        selectInput("n_states", "Number of HMM states", choices = c(3, 4, 5), selected = 4),
         helper(
           numericInput("itr", "Number of iterations", 100, 100, 1000, 50),
           type = "inline", title = "Number of iterations",
@@ -222,11 +224,18 @@ navbarPage(
           style = "minimal",
           color = "primary"
         ),
+        downloadBttn(
+          outputId = "downloadQuality",
+          label = "Download QualityReport",
+          style = "minimal",
+          color = "primary"
+        ),
         tags$hr(),
         withSpinner(
           DT::dataTableOutput("tmspntTbl"),
           image = "sleepyfly3.gif", image.width = 640.5, image.height = 360
-        )
+        ),
+        DT::dataTableOutput("qualityTbl")
       ) # end tabPanel "Download data"
     ) # end navlistPanel
   ), # end tabPanel "Sleep Profiles"

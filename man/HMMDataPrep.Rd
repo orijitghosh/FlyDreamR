@@ -9,7 +9,8 @@ HMMDataPrep(
   result_dir = getwd(),
   ldcyc = 12,
   day_range = c(1, 2),
-  ...
+  ...,
+  removeDeadAnimals = FALSE
 )
 }
 \arguments{
@@ -44,6 +45,9 @@ considered sleep. Default: \code{c(behavr::mins(5), behavr::mins(1440))}.
 For example, use \code{c(behavr::mins(10), behavr::mins(1440))} to
 require 10 minutes of immobility.}
 }}
+
+\item{removeDeadAnimals}{Remove the day on which sustained low activity begins
+and later days for each animal. Default: \code{FALSE}.}
 }
 \value{
 A \code{behavr} table (class \code{behavr} and \code{data.table})

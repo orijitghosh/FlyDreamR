@@ -14,6 +14,18 @@ color: red;
 }
 "
 
+stageUploadedDamFiles <- function(upload, destination) {
+  if (is.null(upload) || !all(c("name", "datapath") %in% names(upload))) {
+    stop("Upload DAM files before starting the analysis.", call. = FALSE)
+  }
+  dir.create(destination, recursive = TRUE, showWarnings = FALSE)
+  staged <- file.path(destination, basename(upload$name))
+  if (!all(file.copy(upload$datapath, staged, overwrite = TRUE))) {
+    stop("Could not stage one or more DAM files.", call. = FALSE)
+  }
+  staged
+}
+
 withBusyIndicatorUI <- function(button) {
   id <- button[["attribs"]][["id"]]
   div(
@@ -82,6 +94,6 @@ errorFunc <- function(err, buttonId) {
   errEl <- sprintf("[data-for-btn=%s] .btn-err", buttonId)
   errElMsg <- sprintf("[data-for-btn=%s] .btn-err-msg", buttonId)
   errMessage <- gsub("^ddpcr: (.*)", "\\1", err$message)
-  shinyjs::html(html = errMessage, selector = errElMsg)
+  shinyjs::html(html = htmltools::htmlEscape(errMessage), selector = errElMsg)
   shinyjs::show(selector = errEl, anim = TRUE, animType = "fade")
 }

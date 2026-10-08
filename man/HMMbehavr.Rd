@@ -4,7 +4,7 @@
 \alias{HMMbehavr}
 \title{Infer Sleep States Using Hidden Markov Model}
 \usage{
-HMMbehavr(behavtbl, it = 100, ldcyc = NULL)
+HMMbehavr(behavtbl, it = 100, ldcyc = NULL, n_states = 4L)
 }
 \arguments{
 \item{behavtbl}{A \code{behavr} table (data.frame/data.table) containing
@@ -25,9 +25,11 @@ all iterations, providing a measure of classification confidence.}
 \item{ldcyc}{Numeric value specifying the light phase duration in hours
 (e.g., 12 for LD 12:12). If \code{NULL} (default), assumes a 12-hour
 light phase. Used to assign "light" and "dark" phase labels to time points.}
+
+\item{n_states}{Number of states to fit: 3, 4, or 5. Default: 4.}
 }
 \value{
-A list containing two data frames:
+A list containing three data frames:
 \describe{
 \item{\code{TimeSpentInEachState}}{Summary of time (in minutes) spent in
 each state, grouped by:
@@ -36,7 +38,8 @@ each state, grouped by:
 \item \code{Genotype}: Genotype
 \item \code{day}: Day number
 \item \code{phase}: Light or dark phase
-\item \code{state_name}: State0, State1, State2, or State3
+\item \code{state_name}: Activity-ordered state label (State0 to
+State2, State3, or State4, depending on the fitted state count)
 \item \code{time_spent}: Minutes in that state
 \item Additional metadata columns (e.g., \code{sex}, \code{treatment})
 }
@@ -46,22 +49,23 @@ All state-phase combinations are present (filled with 0 if not observed).
 \itemize{
 \item \code{timestamp}: Time point index (1 to total time points)
 \item \code{state}: Raw HMM state label
-\item \code{state_name}: Activity-ordered state name (State0-State3)
+\item \code{state_name}: Activity-ordered state label (State0 to
+State2, State3, or State4, depending on the fitted state count)
 \item \code{phase}: Light or dark
 \item \code{ID}, \code{Genotype}, \code{day}: Grouping variables
 \item Additional metadata columns (e.g., \code{sex}, \code{treatment})
 }
 }
+\item{\code{QualityReport}}{One row per attempted individual and day,
+with the requested state count, valid fits, status, and reason.}
 }
 }
 \description{
 Applies a Hidden Markov Model (HMM) to behavioral activity data to infer
-discrete sleep/wake states. The model identifies four behavioral states
-(State0-State3) ordered by activity level, where State0 represents the
-highest activity (active wake) and State3 represents the lowest activity
-(deep sleep).
+discrete sleep/wake states. States are ordered by activity level, with
+State0 representing the highest activity. Four states remain the default.
 
-The function fits an HMM with 4 states using Gaussian emission distributions
+The function fits an HMM with Gaussian emission distributions
 for normalized activity levels. Multiple iterations are performed for each
 individual and day to ensure robust state inference, with the most frequently
 inferred state at each time point selected as the final classification.
@@ -76,6 +80,8 @@ States are ordered by mean activity level:
 \item \strong{State2}: Low activity (light sleep)
 \item \strong{State3}: Lowest activity (deep sleep)
 }
+These biological labels apply to the default four-state model. With three
+or five states, labels indicate activity order only.
 }
 
 \subsection{Failed Cases}{
@@ -86,7 +92,8 @@ The function tracks cases where HMM fitting fails or produces invalid results:
 \item Single-state dominance (>99\% of time in one state) - indicates
 insufficient behavioral variability
 }
-Failed cases are printed to console and excluded from results.
+Failed cases are recorded in \code{QualityReport} and excluded from state
+summaries. Unexpected top-level errors stop the call.
 }
 
 \subsection{Performance Notes}{
