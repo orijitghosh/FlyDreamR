@@ -23,6 +23,10 @@
 -   Added comprehensive vignettes for all analysis types
 -   Improved function documentation with examples
 
+## AI use disclosure
+
+The FlyDreamR logo and animated fruit-fly GIFs were created with generative AI. AI tools also assisted with creating the Shiny app from the package. The package authors remain responsible for the software and its scientific content.
+
 # FlyDreamR 0.1.2
 
 -   Initial release

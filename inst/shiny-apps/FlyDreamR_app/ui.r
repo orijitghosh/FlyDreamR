@@ -35,28 +35,22 @@ source("helpers.R")
 
 # --- UI Definition ---
 navbarPage(
-  "FlyDreamR",
+  title = tags$span(class = "brand-name", "FlyDreamR"),
   id = "tabs",
   collapsible = TRUE,
   fluid = TRUE,
   position = "static-top",
   theme = bslib::bs_theme(
-    bg = "#e5e5e5",
-    fg = "#0d0c0c",
-    primary = "#dd2020",
-    base_font = font_google("Press Start 2P"),
-    code_font = font_google("Press Start 2P"),
-    heading_font = font_google("Press Start 2P"),
+    bg = "#f7fafb",
+    fg = "#1b2a33",
+    primary = "#176f78",
+    base_font = font_google("IBM Plex Sans"),
+    code_font = font_google("IBM Plex Mono"),
+    heading_font = font_google("IBM Plex Sans"),
     "font-size-base" = "1rem",
-    "enable-rounded" = FALSE
-  ) %>%
-    bs_add_rules(
-      list(
-        sass::sass_file("nes.css"),
-        sass::sass_file("style.css"),
-        "body { background-color: $body-bg; }"
-      )
-    ),
+    "enable-rounded" = TRUE
+  ),
+  header = tags$head(includeCSS("style.css")),
 
   # ===================================================================
   # 1. DATA INPUT TAB
@@ -64,19 +58,35 @@ navbarPage(
   tabPanel(
     "Data input",
     icon = icon("table"),
+    div(
+      class = "page-intro landing-intro",
+      div(
+        class = "page-intro-copy",
+        tags$h1("Prepare your analysis"),
+        tags$p("Upload monitor and metadata files, choose the experiment settings, then run the model.")
+      ),
+      tags$img(
+        class = "intro-logo",
+        src = "FlyDreamR_logo.png",
+        alt = "FlyDreamR logo showing a sleeping fruit fly and sleep-state symbols"
+      )
+    ),
     sidebarLayout(
       sidebarPanel(
-        width = 3,
+        width = 4,
+        class = "settings-panel",
+        tags$h2("Analysis settings"),
+        tags$h3("Files"),
         fileInput(
           "data",
-          "Choose Monitor Files",
+          "Monitor files",
           multiple = TRUE,
           accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
         ),
         helper(
           fileInput(
             "meta",
-            "Choose Metadata File",
+            "Metadata file",
             multiple = FALSE,
             accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
           ),
@@ -87,6 +97,8 @@ navbarPage(
             "<i>file</i>, <i>start_datetime</i>, <i>stop_datetime</i>, <i>region_id</i>, <i>genotype</i>, <i>replicate</i>"
           )
         ),
+        tags$p(class = "field-note", "A metadata file is required for DAM monitor data."),
+        tags$h3("Experiment"),
         helper(
           numericInput("ldperiod", "LD cycle period", 24, 0, 24),
           type = "inline", title = "LD cycle period",
@@ -108,6 +120,7 @@ navbarPage(
           content = "Subset your data. For an 8-day experiment, the last day is day 7."
         ),
         checkboxInput("remove_dead", "Remove suspected death day and later days", FALSE),
+        tags$h3("Model"),
         selectInput("n_states", "Number of HMM states", choices = c(3, 4, 5), selected = 4),
         helper(
           numericInput("itr", "Number of iterations", 100, 100, 1000, 50),
@@ -119,31 +132,40 @@ navbarPage(
           type = "inline", title = "Number of CPU cores to use",
           content = "Number of CPU cores for parallel processing. Use cores in multiples of your animal groups for efficiency."
         ),
-        helper(
-          withBusyIndicatorUI(
-            actionBttn(
-              inputId = "cal",
-              label = "Start calculations!",
-              style = "minimal",
-              color = "primary",
-              icon = icon("calculator")
-            )
-          ),
-          type = "inline",
-          title = "Start Calculations",
-          content = "Pressing this button will curate data and run all HMM analyses."
+        div(class = "run-analysis-help",
+          helper(
+            withBusyIndicatorUI(
+              actionBttn(
+                inputId = "cal",
+                label = "Run analysis",
+                style = "minimal",
+                color = "primary",
+                icon = icon("calculator")
+              )
+            ),
+            type = "inline",
+            title = "Start Calculations",
+            content = "Pressing this button will curate data and run all HMM analyses."
+          )
         )
       ), # end sidebarPanel
       mainPanel(
-        width = 9,
-        withSpinner(
-          DT::dataTableOutput("contents"),
-          image = "sleepyfly1.gif", image.width = 640.5, image.height = 360
+        width = 8,
+        class = "data-panel",
+        div(
+          class = "section-heading",
+          tags$h2("Data preview"),
+          tags$p("Check the uploaded records before reviewing the analysis results.")
         ),
-        fluidRow(
-          valueBoxOutput("nID"),
-          valueBoxOutput("nGeno"),
-          valueBoxOutput("nDays")
+        uiOutput("preview_ui"),
+        conditionalPanel(
+          condition = "input.cal > 0",
+          tags$h3(class = "summary-heading", "Analysis summary"),
+          fluidRow(class = "summary-grid",
+            valueBoxOutput("nID"),
+            valueBoxOutput("nGeno"),
+            valueBoxOutput("nDays")
+          )
         )
       ) # end mainPanel
     ) # end sidebarLayout
@@ -153,10 +175,18 @@ navbarPage(
   # 2. SLEEP PROFILES TAB
   # ===================================================================
   tabPanel(
-    "Sleep Profiles",
+    "Sleep profiles",
     icon = icon("chart-area"),
-    navlistPanel(
-      widths = c(3, 9),
+    div(
+      class = "page-intro profiles-intro",
+      div(
+        class = "page-intro-copy",
+        tags$h1("Explore sleep profiles"),
+        tags$p("Review the model output, inspect individual profiles, and download the processed data.")
+      )
+    ),
+    tabsetPanel(
+      type = "tabs",
       tabPanel(
         helper(
           "All sleep profiles",
@@ -164,21 +194,31 @@ navbarPage(
           title = "Aggregated Sleep Profiles",
           content = "All sleep profiles for all individuals for the chosen days will be shown here."
         ),
-        splitLayout(
-          numericInput("alletho_height", "height", 500, 100, 10000, 20),
-          numericInput("alletho_width", "width", 1500, 500, 10000, 50),
-          actionBttn(
+        div(class = "plot-toolbar", splitLayout(
+          numericInput("alletho_height", "Height", 500, 100, 10000, 20),
+          numericInput("alletho_width", "Width", 1500, 500, 10000, 50),
+          actionButton(
             inputId = "plotalletho",
-            label = "Plot",
-            style = "minimal",
-            color = "primary",
-            icon = icon("forward")
+            label = "Generate plot",
+            class = "btn-primary",
+            icon = icon("chart-line")
           )
+        )),
+        conditionalPanel(
+          condition = "!input.plotalletho",
+          div(class = "empty-state",
+              tags$img(src = "sleepyfly2.gif", alt = "Animated pixel-art fruit fly"),
+              tags$h3("No plot generated yet"),
+              tags$p("Run the analysis on Data input, then generate this plot."))
         ),
-        tags$hr(),
-        withSpinner(
-          plotOutput("alletho"),
-          image = "sleepyfly2.gif", image.width = 640.5, image.height = 360
+        conditionalPanel(
+          condition = "input.plotalletho",
+          div(class = "plot-result",
+            withSpinner(
+              plotOutput("alletho"),
+              image = "sleepyfly2.gif", image.width = 320, image.height = 180
+            )
+          )
         )
       ),
       tabPanel(
@@ -188,21 +228,31 @@ navbarPage(
           title = "Individual Diagnostic Profiles",
           content = "All diagnostic sleep profiles for each individual for the chosen days will be shown."
         ),
-        splitLayout(
-          numericInput("allethoind_height", "height", 1200, 500, 10000, 20),
-          numericInput("allethoind_width", "width", 2000, 500, 10000, 50),
-          actionBttn(
+        div(class = "plot-toolbar", splitLayout(
+          numericInput("allethoind_height", "Height", 1200, 500, 10000, 20),
+          numericInput("allethoind_width", "Width", 2000, 500, 10000, 50),
+          actionButton(
             inputId = "plotallethoind",
-            label = "Plot",
-            style = "minimal",
-            color = "primary",
-            icon = icon("forward")
+            label = "Generate plot",
+            class = "btn-primary",
+            icon = icon("chart-line")
           )
+        )),
+        conditionalPanel(
+          condition = "!input.plotallethoind",
+          div(class = "empty-state",
+              tags$img(src = "sleepyfly2.gif", alt = "Animated pixel-art fruit fly"),
+              tags$h3("No plot generated yet"),
+              tags$p("Run the analysis on Data input, then generate this plot."))
         ),
-        tags$hr(),
-        withSpinner(
-          plotOutput("allethoind"),
-          image = "sleepyfly2.gif", image.width = 640.5, image.height = 360
+        conditionalPanel(
+          condition = "input.plotallethoind",
+          div(class = "plot-result",
+            withSpinner(
+              plotOutput("allethoind"),
+              image = "sleepyfly2.gif", image.width = 320, image.height = 180
+            )
+          )
         )
       ),
       tabPanel(
@@ -212,51 +262,51 @@ navbarPage(
           title = "Download Processed Data",
           content = "All sleep data will be available for download as a <b>.csv</b> file."
         ),
-        downloadBttn(
-          outputId = "downloadData_tmspntTbl",
-          label = "Download time spent data",
-          style = "minimal",
-          color = "primary"
+        div(class = "download-actions",
+          downloadBttn(
+            outputId = "downloadData_tmspntTbl",
+            label = "Download time spent data",
+            style = "minimal",
+            color = "primary"
+          ),
+          downloadBttn(
+            outputId = "downloadData_prfTbl",
+            label = "Download individual sleep profiles",
+            style = "minimal",
+            color = "primary"
+          ),
+          downloadBttn(
+            outputId = "downloadQuality",
+            label = "Download QualityReport",
+            style = "minimal",
+            color = "primary"
+          )
         ),
-        downloadBttn(
-          outputId = "downloadData_prfTbl",
-          label = "Download individual sleep profiles",
-          style = "minimal",
-          color = "primary"
+        conditionalPanel(
+          condition = "!input.cal",
+          div(class = "empty-state",
+              tags$img(src = "sleepyfly3.gif", alt = "Animated pixel-art fruit fly"),
+              tags$h3("No processed data yet"),
+              tags$p("Run the analysis to view and download processed data."))
         ),
-        downloadBttn(
-          outputId = "downloadQuality",
-          label = "Download QualityReport",
-          style = "minimal",
-          color = "primary"
-        ),
-        tags$hr(),
-        withSpinner(
-          DT::dataTableOutput("tmspntTbl"),
-          image = "sleepyfly3.gif", image.width = 640.5, image.height = 360
+        conditionalPanel(
+          condition = "input.cal",
+          withSpinner(
+            DT::dataTableOutput("tmspntTbl"),
+            image = "sleepyfly3.gif", image.width = 320, image.height = 180
+          )
         ),
         DT::dataTableOutput("qualityTbl")
       ) # end tabPanel "Download data"
-    ) # end navlistPanel
+    ) # end tabsetPanel
   ), # end tabPanel "Sleep Profiles"
 
   # ===================================================================
   # FOOTER
   # ===================================================================
   footer = tags$footer(
-    "Theme from NES.css",
-    style = "
-      position: fixed;
-      text-align: center;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 45px;
-      padding: 10px;
-      color: #0d0c0c;
-      background-color: #e5e5e5;
-      border-top: 4px solid #0d0c0c;
-      z-index: 1000;
-    "
+    "FlyDreamR · Sleep and behavioral-state analysis · ",
+    tags$a(href = "mailto:arijitghosh2009@gmail.com", "Contact"),
+    class = "app-footer"
   )
 ) # end navbarPage

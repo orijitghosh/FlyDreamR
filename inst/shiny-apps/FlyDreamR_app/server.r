@@ -42,25 +42,6 @@ library(ggplot2)
 source("helpers.R")
 
 shinyServer(function(input, output, session) {
-  shinyalert(
-    title = "FlyDreamR!",
-    text = "<b>This app requires a metadata file for your DAMs. Contact <i>arijitghosh2009@gmail.com</i> for bugs,
-    suggestions, troubleshooting and customizations.</b>",
-    closeOnEsc = TRUE,
-    closeOnClickOutside = FALSE,
-    html = TRUE,
-    showConfirmButton = TRUE,
-    showCancelButton = FALSE,
-    confirmButtonText = "Understood!",
-    confirmButtonCol = "#AEDEF4",
-    timer = 0,
-    imageUrl = "./FlyDreamR_logo.png",
-    imageWidth = 200,
-    imageHeight = 200,
-    animation = TRUE,
-    size = "s"
-  )
-
   session$onSessionEnded(stopApp)
   observe_helpers(withMathJax = TRUE)
 
@@ -70,6 +51,20 @@ shinyServer(function(input, output, session) {
     dt_curated = NULL,
     res1 = NULL
   )
+
+  output$preview_ui <- renderUI({
+    if (is.null(input$meta)) {
+      div(class = "empty-state",
+          tags$img(src = "sleepyfly1.gif", alt = "Animated pixel-art fruit fly"),
+          tags$h3("Start with your metadata file"),
+          tags$p("Upload a metadata file to preview its records here."))
+    } else {
+      withSpinner(
+        DT::dataTableOutput("contents"),
+        image = "sleepyfly1.gif", image.width = 320, image.height = 180
+      )
+    }
+  })
 
   # Observer for displaying the uploaded metadata file
   # This block only runs when the metadata file is uploaded and its only job is to display the table.
@@ -123,8 +118,7 @@ shinyServer(function(input, output, session) {
     req(results$dt_curated) # Require results$dt_curated to exist
     valueBox(
       length(unique(results$dt_curated$id)), "Individuals",
-      icon = icon("user", lib = "glyphicon"),
-      color = "yellow", width = 2
+      color = "yellow", width = 12
     )
   })
 
@@ -132,8 +126,7 @@ shinyServer(function(input, output, session) {
     req(results$dt_curated) # Require results$dt_curated to exist
     valueBox(
       length(unique(results$dt_curated$genotype)), "Genotypes",
-      icon = icon("barcode", lib = "glyphicon"),
-      color = "red", width = 2
+      color = "red", width = 12
     )
   })
 
@@ -141,8 +134,7 @@ shinyServer(function(input, output, session) {
     req(results$dt_curated) # Require results$dt_curated to exist
     valueBox(
       length(unique(results$dt_curated$day)), "Days",
-      icon = icon("calendar", lib = "glyphicon"),
-      color = "blue", width = 2
+      color = "blue", width = 12
     )
   })
 
